@@ -1,0 +1,22 @@
+﻿.msg-output {
+	display: none;
+}
+.msg-output.active {
+	display: block;
+	border: 1px solid lightgray;
+	padding: 10px;
+	margin-top: 5px;
+}
+.msg-user, .msg-date {
+	display: inline-block;
+	margin-right: 5px;
+}
+.msg-user{
+	font-weight: bold;
+}
+.msg-content{
+	display: block;
+	border: 1px solid red;
+	padding: 10px;
+	margin-top: 5px;
+}

@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>App</title>
+	{% load static %}
+	<link rel="stylesheet" type="text/css" href="{% static 'dzencode/css/styles.css' %}">
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('a').forEach(function(element) {
+        element.addEventListener('click', function(event) {
+            event.preventDefault();
+            fetchData(event);
+        });
+    });
+});
+
+function fetchData(event) {
+    const title = event.target.name;
+
+    // Очистка всех контейнеров и удаление класса active
+    document.querySelectorAll('.msg-output').forEach(function(cur_post) {
+        cur_post.classList.remove('active');
+        cur_post.querySelector('.msg-content').innerText = '';
+        cur_post.querySelector('.msg-user').innerText = '';
+        cur_post.querySelector('.msg-date').innerText = '';
+    });
+
+    // Запрос данных
+    fetch(`/?title=${title}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            console.error(data.error);
+            return;
+        }
+        const cur_post = event.target.closest('h3').nextElementSibling;
+        cur_post.classList.add('active');
+        cur_post.querySelector('.msg-content').innerText = data.message;
+        cur_post.querySelector('.msg-user').innerText = data.user_name;
+        cur_post.querySelector('.msg-date').innerText = data.date;
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+</head>
+<body> 
+<h2>App</h2>
+== {{ some }} {{ vars }} ==<br>
+{% for msg in msgs %}
+    <h3>
+        <a href="#" name="{{ msg.title }}">{{ msg.title }}</a>
+    </h3>
+    <div class="msg-output">
+        <span class="msg-user" title="{{ msg.user.username }}"></span> <span class="msg-date"></span>
+        <div class="msg-content"></div>
+    </div>
+{% endfor %}
+<hr>
+<!--
+{{ msgs }}:<br>
+{% for msg in msgs %}
+<br>{{ msg.title }} by {{ msg.user.username }} ({{ msg.date }}): {{ msg.content }}
+{% endfor %}
+-->
+</body>
+</html>
