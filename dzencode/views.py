@@ -30,11 +30,11 @@ def index(request):
         else:
             return JsonResponse({'error': 'Message does not exist'}, status=404)
     else:
-        msgs = MsgDb.objects.select_related('user').filter(is_root=True)  ## display root posts only
+        msgs = MsgDb.objects.select_related('user').filter(is_root=True) ## display root posts only
         return render(request, 'index.html', context={'msgs': msgs})
 
 def add_comment(request):
-    if request.method == 'POST':
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         form = CommentForm(request.POST)
         if form.is_valid():
             content = form.cleaned_data['content']
@@ -49,11 +49,23 @@ def add_comment(request):
                 published_time=timezone.now().time(),
                 content=content,
                 parent=parent,
-                is_root=False  ## consider as comment
+                is_root=False ## consider as comment
             )
-            return redirect('/')
+            data = {
+                'parent_id': parent_id,
+                'comments': [
+                    {
+                        'id': c.id,
+                        'content': c.content,
+                        'user__username': c.user.username,
+                        'published_date': c.published_date.strftime('%Y-%m-%d'),
+                        'published_time': c.published_time.strftime('at %H:%M:%S')
+                    }
+                    for c in (parent.comments.all() if parent else [])
+                ]
+            }
+            return JsonResponse(data)
         else:
-            return render(request, 'index.html', {'form': form, 'msgs': MsgDb.objects.select_related('user').filter(is_root=True)})
-    else:
-        form = CommentForm()
-    return render(request, 'index.html', {'form': form, 'msgs': MsgDb.objects.select_related('user').filter(is_root=True)})
+            return JsonResponse({'error': 'Invalid form data'}, status=400)
+    return redirect('/')
+

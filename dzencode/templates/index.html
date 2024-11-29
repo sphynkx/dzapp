@@ -10,12 +10,70 @@
 document.addEventListener("DOMContentLoaded", function() {
     function addReplyHandlers() {
         document.querySelectorAll('.reply-btn').forEach(function(button) {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                const commentForm = event.target.nextElementSibling;
-                commentForm.classList.toggle('hidden');
-            });
+            button.removeEventListener('click', replyHandler);
+            button.addEventListener('click', replyHandler);
         });
+    }
+
+    function replyHandler(event) {
+        event.preventDefault();
+        document.querySelectorAll('.comment-form').forEach(function(form) {
+            form.classList.add('hidden');
+        });
+        const commentForm = event.target.nextElementSibling;
+        commentForm.classList.toggle('hidden');
+    }
+
+    function submitFormHandler(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            if (data.parent_id) {
+                const commentsContainer = document.querySelector(`[data-id="${data.parent_id}"] .comments`);
+                commentsContainer.innerHTML = '';
+                data.comments.forEach(comment => {
+                    const commentElement = document.createElement('div');
+                    commentElement.classList.add('comment');
+                    commentElement.innerHTML = `
+                        <strong>${comment.user__username}</strong> (${comment.published_date} ${comment.published_time.split('.')[0]}):
+                        <p>${comment.content}</p>
+                        <button class="reply-btn">Reply</button>
+                        <form action="{% url 'add_comment' %}" method="post" class="comment-form hidden">
+                            {% csrf_token %}
+                            <input type="hidden" name="parent_id" value="${comment.id}">
+                            <input type="text" name="user_name" placeholder="Your Name" value="Anonymous" required>
+                            <input type="email" name="email" placeholder="Email" value="no@thankx.com" required>
+                            <input type="text" name="homepage" placeholder="Homepage" value="http://localhost/">
+                            <!-- input type="text" name="captcha" placeholder="Enter Captcha" required -->
+                            <!-- div>{ % captcha % }</div -->
+                            <textarea name="content" placeholder="Write your comment here" required></textarea>
+                            <button type="submit">Send</button>
+                        </form>
+                    `;
+                    commentsContainer.appendChild(commentElement);
+                });
+                addReplyHandlers(); //Reply buttons for root posts
+                form.classList.add('hidden');
+            } else {
+                window.location.reload();
+            }
+            form.reset();
+        })
+        .catch(error => console.error('Error:', error));
     }
 
     function fetchData(event) {
@@ -56,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         {% csrf_token %}
                         <input type="hidden" name="parent_id" value="${comment.id}">
                         <input type="text" name="user_name" placeholder="Your Name" value="Anonymous" required>
-                        <input type="email" name="email" placeholder="Email"  value="no@thankx.com" required>
+                        <input type="email" name="email" placeholder="Email" value="no@thankx.com" required>
                         <input type="text" name="homepage" placeholder="Homepage" value="http://localhost/">
                         <!-- input type="text" name="captcha" placeholder="Enter Captcha" required -->
                         <!-- div>{ % captcha % }</div -->
@@ -73,7 +131,6 @@ document.addEventListener("DOMContentLoaded", function() {
         .catch(error => console.error('Error:', error));
     }
 
-    // handle links to root posts
     document.querySelectorAll('a').forEach(function(element) {
         element.addEventListener('click', function(event) {
             event.preventDefault();
@@ -81,7 +138,11 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    addReplyHandlers(); // Reply buttons for comments
+    document.querySelectorAll('.comment-form').forEach(function(form) {
+        form.addEventListener('submit', submitFormHandler);
+    });
+
+    addReplyHandlers(); // // Reply buttons for comments
 });
 </script>
 </head>
@@ -91,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <h3>
         <a href="#" name="{{ msg.title }}">{{ msg.title }}</a>
     </h3>
-    <div class="msg-output">
+    <div class="msg-output" data-id="{{ msg.id }}">
         <span class="msg-user" title="{{ msg.user.username }}"></span>
         <span class="msg-date-time"></span>
         <div class="msg-content"></div>
