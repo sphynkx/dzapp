@@ -4,46 +4,85 @@
     <meta charset="utf-8" />
     <title>App</title>
     {% load static %}
+    <!-- { % load captcha % } -->
     <link rel="stylesheet" type="text/css" href="{% static 'dzencode/css/styles.css' %}">
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    function addReplyHandlers() {
+        document.querySelectorAll('.reply-btn').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const commentForm = event.target.nextElementSibling;
+                commentForm.classList.toggle('hidden');
+            });
+        });
+    }
+
+    function fetchData(event) {
+        const title = event.target.name;
+        // clean all fields..
+        document.querySelectorAll('.msg-output').forEach(function(cur_post) {
+            cur_post.classList.remove('active');
+            cur_post.querySelector('.msg-content').innerText = '';
+            cur_post.querySelector('.msg-user').innerText = '';
+            cur_post.querySelector('.msg-date-time').innerText = '';
+            cur_post.querySelector('.comments').innerHTML = '';
+        });
+
+        fetch(`/?title=${title}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            const cur_post = event.target.closest('h3').nextElementSibling;
+            cur_post.classList.add('active');
+            cur_post.querySelector('.msg-content').innerText = data.message;
+            cur_post.querySelector('.msg-user').innerText = data.user_name;
+            cur_post.querySelector('.msg-date-time').innerText = `(${data.date} ${data.time.split('.')[0]})`;
+
+            const commentsContainer = cur_post.querySelector('.comments');
+            data.comments.forEach(comment => {
+                const commentElement = document.createElement('div');
+                commentElement.classList.add('comment');
+                commentElement.innerHTML = `
+                    <strong>${comment.user__username}</strong> (${comment.published_date} ${comment.published_time.split('.')[0]}):
+                    <p>${comment.content}</p>
+                    <button class="reply-btn">Reply</button>
+                    <form action="{% url 'add_comment' %}" method="post" class="comment-form hidden">
+                        {% csrf_token %}
+                        <input type="hidden" name="parent_id" value="${comment.id}">
+                        <input type="text" name="user_name" placeholder="Your Name" value="Anonymous" required>
+                        <input type="email" name="email" placeholder="Email"  value="no@thankx.com" required>
+                        <input type="text" name="homepage" placeholder="Homepage" value="http://localhost/">
+                        <!-- input type="text" name="captcha" placeholder="Enter Captcha" required -->
+                        <!-- div>{ % captcha % }</div -->
+                        <textarea name="content" placeholder="Write your comment here" required></textarea>
+                        <button type="submit">Send</button>
+                    </form>
+                    <div class="comments"></div> <!-- comments and subcomments -->
+                `;
+                commentsContainer.appendChild(commentElement);
+            });
+
+            addReplyHandlers(); // Reply buttons for root posts
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // handle links to root posts
     document.querySelectorAll('a').forEach(function(element) {
         element.addEventListener('click', function(event) {
             event.preventDefault();
             fetchData(event);
         });
     });
+
+    addReplyHandlers(); // Reply buttons for comments
 });
-
-function fetchData(event) {
-    const title = event.target.name;
-
-    document.querySelectorAll('.msg-output').forEach(function(cur_post) {
-        cur_post.classList.remove('active');
-        cur_post.querySelector('.msg-content').innerText = '';
-        cur_post.querySelector('.msg-user').innerText = '';
-        cur_post.querySelector('.msg-date').innerText = '';
-        cur_post.querySelector('.msg-time').innerText = '';  // очищаем поле времени
-    });
-
-    fetch(`/?title=${title}`, {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            console.error(data.error);
-            return;
-        }
-        const cur_post = event.target.closest('h3').nextElementSibling;
-        cur_post.classList.add('active');
-        cur_post.querySelector('.msg-content').innerText = data.message;
-        cur_post.querySelector('.msg-user').innerText = data.user_name;
-        cur_post.querySelector('.msg-date').innerText = data.date;
-        cur_post.querySelector('.msg-time').innerText = data.time;  // добавляем поле времени
-    })
-    .catch(error => console.error('Error:', error));
-}
 </script>
 </head>
 <body>
@@ -54,9 +93,19 @@ function fetchData(event) {
     </h3>
     <div class="msg-output">
         <span class="msg-user" title="{{ msg.user.username }}"></span>
-        <span class="msg-date"></span>
-        <span class="msg-time"></span>  <!-- новое поле для времени -->
+        <span class="msg-date-time"></span>
         <div class="msg-content"></div>
+        <button class="reply-btn">Reply</button>
+        <form action="{% url 'add_comment' %}" method="post" class="comment-form hidden">
+            {% csrf_token %}
+            <input type="hidden" name="parent_id" value="{{ msg.id }}">
+            <input type="text" name="user_name" placeholder="Name" value="Anonymous" required>
+            <input type="email" name="email" placeholder="Email" value="no@thankx.com" required>
+            <input type="text" name="homepage" placeholder="Homepage" value="http://localhost/">
+            <textarea name="content" placeholder="Write your comment here" required></textarea>
+            <button type="submit">Send</button>
+        </form>
+        <div class="comments"></div>
     </div>
 {% endfor %}
 <hr>
