@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
             form.removeEventListener('submit', submitFormHandler);
             form.addEventListener('submit', submitFormHandler);
         });
+        initializeEditorButtons();
     }
 
     function replyHandler(event) {
@@ -21,9 +22,23 @@ document.addEventListener("DOMContentLoaded", function() {
         commentForm.classList.toggle('hidden');
     }
 
+    function validateEmail(email) {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(email);
+    }
+
     function submitFormHandler(event) {
         event.preventDefault();
         const form = event.target;
+        const emailInput = form.querySelector('input[name="email"]');
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        if (!validateEmail(emailInput.value)) {
+            alert('Please enter a valid email address.');
+            emailInput.focus();
+            return;
+        }
+
         const formData = new FormData(form);
 
         console.log("Form data before submit:", Array.from(formData.entries()));
@@ -57,11 +72,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 const parentComment = document.querySelector(`[data-id="${data.parent_id}"]`);
                 const commentsContainer = parentComment.querySelector('.comments');
                 const comment = data.comment;
+
                 const commentElement = document.createElement('div');
                 commentElement.classList.add('comment');
                 commentElement.dataset.id = comment.id;
                 commentElement.innerHTML = `
-                    <strong>${comment.user__username}</strong> (${comment.published_date} ${comment.published_time.split('.')[0]}):
+                    <strong>${comment.user__username}</strong>
+                    <a href="${comment.homepage}" target="_blank">🏠</a>
+                    <a href="mailto:${comment.email}" target="_blank">✉️</a>
+                    (${comment.published_date} ${comment.published_time.split('.')[0]}):
                     <p>${comment.content}</p>
                     <button class="reply-btn">Reply</button>
                     <form action="${addCommentURL}" method="post" class="comment-form hidden">
@@ -69,10 +88,17 @@ document.addEventListener("DOMContentLoaded", function() {
                         <input type="hidden" name="parent_id" value="${comment.id}">
                         <div class="form-group">
                             <input type="text" name="user_name" placeholder="Your Name" value="Anonymous" required>
-                            <input type="email" name="email" placeholder="Email" value="no@thankx.com" required>
-                            <input type="text" name="homepage" placeholder="Homepage" value="http://localhost/">
+                            <input type="email" name="email" placeholder="Email" required>
+                            <input type="text" name="homepage" placeholder="Homepage">
                         </div>
-                        <textarea name="content" placeholder="Write your comment here" required></textarea>
+                        <div class="toolbar">
+                            <button type="button" class="strong-btn">Strong</button>
+                            <button type="button" class="italic-btn">Italic</button>
+                            <button type="button" class="code-btn">Code</button>
+                            <button type="button" class="link-btn">Link</button>
+                        </div>
+                        <div class="editor" contenteditable="true" placeholder="Write your comment here"></div>
+                        <textarea name="content" hidden required></textarea>
                         <div class="form-group">
                             <button type="submit" title="Childe2">Send</button>
                         </div>
@@ -80,7 +106,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     <div class="comments"></div>
                 `;
                 commentsContainer.appendChild(commentElement);
-                addReplyHandlers(); //Reply buttons for root posts
+                addReplyHandlers(); // Reply buttons for root posts
+
+                initializeEditorButtons();
+
                 form.classList.add('hidden');
             } else {
                 form.reset();
@@ -132,18 +161,30 @@ document.addEventListener("DOMContentLoaded", function() {
                     commentElement.classList.add('comment');
                     commentElement.dataset.id = comment.id;
                     commentElement.innerHTML = `
-                        <strong>${comment.user__username}</strong> (${comment.published_date} ${comment.published_time.split('.')[0]}):
-                        <p>${comment.content}</p>
+                        <strong>${comment.user__username}</strong>
+                        <a href="${comment.homepage}" target="_blank">🏠</a>
+                        <a href="mailto:${comment.email}" target="_blank">✉️</a>
+                        (${comment.published_date} ${comment.published_time.split('.')[0]}):
+                        <div class="comment-content">
+                            <p>${comment.content}</p>
+                        </div>
                         <button class="reply-btn">Reply</button>
                         <form action="${addCommentURL}" method="post" class="comment-form hidden">
                             <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
                             <input type="hidden" name="parent_id" value="${comment.id}">
                             <div class="form-group">
                                 <input type="text" name="user_name" placeholder="Your Name" value="Anonymous" required>
-                                <input type="email" name="email" placeholder="Email" value="no@thankx.com" required>
-                                <input type="text" name="homepage" placeholder="Homepage" value="http://localhost/">
+                                <input type="email" name="email" placeholder="Email" required>
+                                <input type="text" name="homepage" placeholder="Homepage">
                             </div>
-                            <textarea name="content" placeholder="Write your comment here" required></textarea>
+                            <div class="toolbar">
+                                <button type="button" class="strong-btn">Strong</button>
+                                <button type="button" class="italic-btn">Italic</button>
+                                <button type="button" class="code-btn">Code</button>
+                                <button type="button" class="link-btn">Link</button>
+                            </div>
+                            <div class="editor" contenteditable="true" placeholder="Write your comment here"></div>
+                            <textarea name="content" hidden required></textarea>
                             <div class="form-group">
                                 <button type="submit" title="Childe">Send</button>
                             </div>
@@ -152,6 +193,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     `;
                     container.appendChild(commentElement);
                     renderComments(comment.children, commentElement.querySelector('.comments'));
+
+                    initializeEditorButtons();
                 });
             }
 

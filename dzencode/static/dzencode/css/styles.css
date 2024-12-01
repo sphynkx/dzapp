@@ -1,24 +1,24 @@
 ﻿.msg-output {
-	display: none;
+    display: none;
 }
 .msg-output.active {
-	display: block;
-	border: 1px solid lightgray;
-	padding: 10px;
-	margin-top: 5px;
+    display: block;
+    border: 1px solid lightgray;
+    padding: 10px;
+    margin-top: 5px;
 }
 .msg-user, .msg-date {
-	display: inline-block;
-	margin-right: 5px;
+    display: inline-block;
+    margin-right: 5px;
 }
-.msg-user{
-	font-weight: bold;
+.msg-user {
+    font-weight: bold;
 }
-.msg-content{
-	display: block;
-	border: 1px solid red;
-	padding: 10px;
-	margin-top: 5px;
+.msg-content {
+    display: block;
+    border: 1px solid red;
+    padding: 10px;
+    margin-top: 5px;
 }
 .form-group {
     margin-bottom: 10px;
@@ -39,6 +39,64 @@ textarea {
 .comment p {
     margin: 0;
 }
+.comment-content {
+    border: 1px dotted blue;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: ghostwhite;
+}
 .reply-btn {
     margin-top: 10px;
+}
+.toolbar {
+    margin-bottom: 10px;
+}
+button {
+    background-color: gray;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+button:hover {
+    background-color: lightgray;
+}
+.editor {
+    border: 1px solid lightgray;
+    padding: 10px;
+    min-height: 100px;
+    margin-bottom: 10px;
+}
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    /*background-color: rgba(0,0,0,0.4);*/
+}
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border: 1px solid lightgray;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+}
+.modal-content label,
+.modal-content input {
+    margin-bottom: 10px;
+}
+.modal-content .buttons {
+    display: flex;
+    justify-content: space-between;
+}
+.url-submit[disabled] {
+    background-color: lightgray;
+    cursor: not-allowed;
 }

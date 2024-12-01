@@ -5,6 +5,7 @@
     <title>App</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'dzencode/css/styles.css' %}">
+    <script src="{% static 'dzencode/js/editor.js' %}"></script>
     <script src="{% static 'dzencode/js/script01.js' %}"></script>
     <script>
         const addCommentURL = "{% url 'add_comment' %}";
@@ -30,7 +31,14 @@
                 <input type="email" name="email" placeholder="Email" value="no@thankx.com" required>
                 <input type="text" name="homepage" placeholder="Homepage" value="http://localhost/">
             </div>
-            <textarea name="content" placeholder="Write your comment here" required></textarea>
+            <div class="toolbar">
+                <button type="button" class="strong-btn">Strong</button>
+                <button type="button" class="italic-btn">Italic</button>
+                <button type="button" class="code-btn">Code</button>
+                <button type="button" class="link-btn">Link</button>
+            </div>
+            <div class="editor" contenteditable="true" placeholder="Write your comment here"></div>
+            <textarea name="content" hidden required></textarea>
             <div class="form-group">
                 <button type="submit" title="Roote">Send</button>
             </div>
