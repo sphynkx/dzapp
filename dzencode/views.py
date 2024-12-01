@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .models import MsgDb, User
 from .forms import CommentForm
 from django.utils import timezone
@@ -37,20 +37,21 @@ def index(request):
         msgs = MsgDb.objects.select_related('user').filter(is_root=True)  ## display root posts only
         return render(request, 'index.html', context={'msgs': msgs})
 
-
 def add_comment(request):
-    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        logger.debug("Received POST request with AJAX header")
+    if request.method == 'POST' or request.headers.get('x-requested-with') == 'XMLHttpRequest':
         form = CommentForm(request.POST)
         if form.is_valid():
-            logger.debug("Form is valid")
             content = form.cleaned_data['content']
             user_name = form.cleaned_data['user_name']
             parent_id = request.POST.get('parent_id')
-            logger.debug(f"parent_id: {parent_id}")
+
+            try:
+                parent = MsgDb.objects.get(id=parent_id) if parent_id else None  ## consider as root post
+            except MsgDb.DoesNotExist:
+                return JsonResponse({'error': 'Parent comment does not exist'}, status=400)
+
             user, created = User.objects.get_or_create(username=user_name)
-            logger.debug(f"User: {user}, created: {created}")
-            parent = MsgDb.objects.get(id=parent_id) if parent_id else None  ## consider as root post
+
             comment = MsgDb.objects.create(
                 title=f"Comment by {user.username}",
                 user=user,
@@ -61,11 +62,9 @@ def add_comment(request):
                 is_root=False,  ## consider as comment
                 has_child=False  ## default value for new posts/comments
             )
-            logger.debug(f"Created comment: {comment}")
             if parent:
                 parent.has_child = True
                 parent.save()
-                logger.debug(f"Updated parent: {parent}")
 
             def get_comment_data(comment):
                 return {
@@ -82,11 +81,11 @@ def add_comment(request):
                 'parent_id': parent_id,
                 'comment': get_comment_data(comment)
             }
-            logger.debug(f"Returning data: {data}")
-            return JsonResponse(data)
+
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse(data)
+            else:
+                return redirect('/')
         else:
-            logger.error("Form is invalid")
-            logger.error(f"Form errors: {form.errors}")
             return JsonResponse({'error': 'Invalid form data'}, status=400)
-    logger.error("Invalid request method or headers")
-    return redirect('/')
+    return JsonResponse({'error': 'Invalid request method or headers'}, status=400)

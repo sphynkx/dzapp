@@ -4,7 +4,7 @@ from dzencode.views import index, add_comment
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', index),
+    path('', index, name='index'),
     path('add_comment/', add_comment, name='add_comment'),
     path('captcha/', include('captcha.urls')),
 ]
