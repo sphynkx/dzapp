@@ -14,38 +14,42 @@
 </head>
 <body>
 <h2>App</h2>
+<div class="msg-all">
 {% for msg in msgs %}
-    <h3>
-        <a href="#" name="{{ msg.title }}">{{ msg.title }}</a>
-    </h3>
-    <div class="msg-output" data-id="{{ msg.id }}">
-        <span class="msg-user" title="{{ msg.user.username }}"></span>
-        <span class="msg-date-time"></span>
-        <div class="msg-content"></div>
-        <button class="reply-btn">Reply</button>
-        <form action="{% url 'add_comment' %}" method="post" class="comment-form hidden">
-            {% csrf_token %}
-            <div class="form-group">
-                <input type="hidden" name="parent_id" value="{{ msg.id }}">
-                <input type="text" name="user_name" placeholder="Name" value="Anonymous" required>
-                <input type="email" name="email" placeholder="Email" value="no@thankx.com" required>
-                <input type="text" name="homepage" placeholder="Homepage" value="http://localhost/">
-            </div>
-            <div class="toolbar">
-                <button type="button" class="strong-btn">Strong</button>
-                <button type="button" class="italic-btn">Italic</button>
-                <button type="button" class="code-btn">Code</button>
-                <button type="button" class="link-btn">Link</button>
-            </div>
-            <div class="editor" contenteditable="true" placeholder="Write your comment here"></div>
-            <textarea name="content" hidden required></textarea>
-            <div class="form-group">
-                <button type="submit" title="Roote">Send</button>
-            </div>
-        </form>
-        <div class="comments"></div>
+    <div class="msg-item">
+        <h3>
+            <a href="#" name="{{ msg.title }}">{{ msg.title }}</a>
+        </h3>
+        <div class="msg-output" data-id="{{ msg.id }}" style="border: 1px solid green; max-height:400px; width:90%; overflow-x:hidden; overflow-y: auto; margin-left:50px;">
+            <span class="msg-user" title="{{ msg.user.username }}"></span>
+            <span class="msg-date-time"></span>
+            <div class="msg-content"></div>
+            <button class="reply-btn">Reply</button>
+            <form action="{% url 'add_comment' %}" method="post" class="comment-form hidden">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="hidden" name="parent_id" value="{{ msg.id }}">
+                    <input type="text" name="user_name" placeholder="Name" value="Anonymous" required>
+                    <input type="email" name="email" placeholder="Email" value="no@thankx.com" required>
+                    <input type="text" name="homepage" placeholder="Homepage" value="http://localhost/">
+                </div>
+                <div class="toolbar">
+                    <button type="button" class="strong-btn">Strong</button>
+                    <button type="button" class="italic-btn">Italic</button>
+                    <button type="button" class="code-btn">Code</button>
+                    <button type="button" class="link-btn">Link</button>
+                </div>
+                <div class="editor" contenteditable="true" placeholder="Write your comment here"></div>
+                <textarea name="content" hidden required></textarea>
+                <div class="form-group">
+                    <button type="submit" title="Roote">Send</button>
+                </div>
+            </form>
+            <div class="comments"></div>
+        </div>
     </div>
 {% endfor %}
+</div>
 <hr>
 </body>
 </html>

@@ -7,6 +7,18 @@
     padding: 10px;
     margin-top: 5px;
 }
+.msg-item {
+    border: 0px solid darkgray;
+    margin: -10px 1px -10px 1px;
+}
+.msg-all {
+    border: 1px solid blue;
+    max-height:450px;
+    width:100%;
+    overflow-x:hidden;
+    overflow-y: auto;
+    padding-bottom:10px;"
+}
 .msg-user, .msg-date {
     display: inline-block;
     margin-right: 5px;
