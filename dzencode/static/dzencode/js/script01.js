@@ -130,6 +130,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function fetchData(event) {
         const title = event.target.name;
+        const cur_post = event.target.closest('h3').nextElementSibling;
+
+        // Toggle click to post
+        if (cur_post.classList.contains('active')) {
+            cur_post.classList.remove('active');
+            cur_post.querySelector('.msg-content').innerText = '';
+            cur_post.querySelector('.msg-user').innerText = '';
+            cur_post.querySelector('.msg-date-time').innerText = '';
+            cur_post.querySelector('.comments').innerHTML = '';
+            return;
+        }
+
         // clean all fields..
         document.querySelectorAll('.msg-output').forEach(function(cur_post) {
             cur_post.classList.remove('active');
@@ -148,7 +160,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.error(data.error);
                 return;
             }
-            const cur_post = event.target.closest('h3').nextElementSibling;
             cur_post.classList.add('active');
             cur_post.querySelector('.msg-content').innerText = data.message;
             cur_post.querySelector('.msg-user').innerText = data.user_name;
