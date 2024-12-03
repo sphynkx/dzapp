@@ -12,7 +12,7 @@
     </script>
 </head>
 <body>
-<h2>App</h2>
+<h2>dzApp</h2>
 
 <div class="sort-options">
     <label>Sort by: </label>
@@ -26,7 +26,7 @@
     <div class="msg-item">
         <h3>
             <a href="#" name="{{ msg.title }}">{{ msg.title }}</a>
-            <span class="msg-aftertitle">by <strong>{{ msg.user.username }}</strong> ({{ msg.published_date|date:"y-m-d" }} at {{ msg.published_time|time:"H:i:s" }})</span>
+            <span class="msg-aftertitle">by <strong>{{ msg.user.username }}</strong> ({{ msg.published_date|date:"Y-m-d" }} at {{ msg.published_time|time:"H:i:s" }})</span>
         </h3>
         <div class="msg-output" data-id="{{ msg.id }}" style="border: 1px solid green; max-height:400px; width:90%; overflow-x:hidden; overflow-y: auto; margin-left:50px;">
             <span class="msg-user" title="{{ msg.user.username }}"></span>
