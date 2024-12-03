@@ -1,4 +1,4 @@
-import { initializeEditorButtons } from './replyHandler.js';
+import { addReplyHandlers, initializeEditorButtons } from './replyHandler.js';
 
 export function renderComments(comments, container) {
     comments.forEach(comment => {
@@ -27,7 +27,9 @@ export function renderComments(comments, container) {
                     <button type="button" class="italic-btn">Italic</button>
                     <button type="button" class="code-btn">Code</button>
                     <button type="button" class="link-btn">Link</button>
+                    <button type="button" class="img-btn">IMG</button>
                 </div>
+                <input type="file" class="img-input" style="display: none;">
                 <div class="editor" contenteditable="true" placeholder="Write your comment here"></div>
                 <textarea name="content" hidden required></textarea>
                 <div class="form-group">

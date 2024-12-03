@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>App</title>
+    <title>dzApp</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'dzencode/css/styles.css' %}">
     <script src="{% static 'dzencode/js/main.js' %}" type="module" defer></script>
@@ -14,6 +14,7 @@
 <body>
 <h2>dzApp</h2>
 
+<!-- Секция сортировки -->
 <div class="sort-options">
     <label>Sort by: </label>
     <button id="sort-title">Title</button>
@@ -46,7 +47,9 @@
                     <button type="button" class="italic-btn">Italic</button>
                     <button type="button" class="code-btn">Code</button>
                     <button type="button" class="link-btn">Link</button>
+                    <button type="button" class="img-btn">IMG</button> <!-- Новая кнопка для загрузки изображений -->
                 </div>
+                <input type="file" class="img-input" style="display: none;"> <!-- Новое поле для выбора файла -->
                 <div class="editor" contenteditable="true" placeholder="Write your comment here"></div>
                 <textarea name="content" hidden required></textarea>
                 <div class="form-group">

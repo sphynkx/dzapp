@@ -116,3 +116,10 @@ button:hover {
     background-color: lightgray;
     cursor: not-allowed;
 }
+.comment-content img {
+    border: 2px solid transparent;
+    padding: 2px;
+}
+.comment-content img:hover {
+    border-color: red;
+}
