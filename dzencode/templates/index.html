@@ -5,8 +5,7 @@
     <title>App</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'dzencode/css/styles.css' %}">
-    <script src="{% static 'dzencode/js/editor.js' %}"></script>
-    <script src="{% static 'dzencode/js/script01.js' %}"></script>
+    <script src="{% static 'dzencode/js/main.js' %}" type="module" defer></script>
     <script>
         const addCommentURL = "{% url 'add_comment' %}";
         const csrfToken = "{{ csrf_token }}";
@@ -30,8 +29,8 @@
                 <div class="form-group">
                     <input type="hidden" name="parent_id" value="{{ msg.id }}">
                     <input type="text" name="user_name" placeholder="Name" value="Anonymous" required>
-                    <input type="email" name="email" placeholder="Email" value="no@thankx.com" required>
-                    <input type="text" name="homepage" placeholder="Homepage" value="http://localhost/">
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="text" name="homepage" placeholder="Homepage">
                 </div>
                 <div class="toolbar">
                     <button type="button" class="strong-btn">Strong</button>
