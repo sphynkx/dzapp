@@ -26,6 +26,10 @@
 .msg-user {
     font-weight: bold;
 }
+.msg-aftertitle {
+    font-weight: normal;
+    display: inline;
+}
 .msg-content {
     display: block;
     border: 1px solid red;
