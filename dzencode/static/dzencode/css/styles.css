@@ -94,7 +94,7 @@ button:hover {
     top: 0;
     width: 100%;
     height: 100%;
-    /*background-color: rgba(0,0,0,0.4);*/
+    /*background-color: rgba(0,0,0,0.2);*/
 }
 .modal-content {
     background-color: white;
@@ -122,4 +122,13 @@ button:hover {
 }
 .comment-content img:hover {
     border-color: red;
+}
+.comment-content pre {
+    border: 2px solid transparent;
+    padding: 2px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+.comment-content pre:hover {
+    border-color: blue;
 }

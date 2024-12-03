@@ -33,10 +33,18 @@ export function initializeEditorButtons() {
         button.removeEventListener('click', imgButtonHandler);
         button.addEventListener('click', imgButtonHandler);
     });
+    document.querySelectorAll('.txt-btn').forEach(function(button) {
+        button.removeEventListener('click', txtButtonHandler);
+        button.addEventListener('click', txtButtonHandler);
+    });
 
     document.querySelectorAll('.img-input').forEach(function(input) {
         input.removeEventListener('change', imgInputChangeHandler);
         input.addEventListener('change', imgInputChangeHandler);
+    });
+    document.querySelectorAll('.txt-input').forEach(function(input) {
+        input.removeEventListener('change', txtInputChangeHandler);
+        input.addEventListener('change', txtInputChangeHandler);
     });
 
     document.querySelectorAll('.editor').forEach(function(editorDiv) {
@@ -55,11 +63,17 @@ function replyHandler(event) {
     document.querySelectorAll('.comment-form').forEach(function(form) {
         form.classList.add('hidden');
         form.reset();
+        clearEditor(form);
     });
     const commentForm = event.target.nextElementSibling;
     commentForm.classList.toggle('hidden');
 }
 
+function clearEditor(form) {
+    const editorDiv = form.querySelector('.editor');
+    editorDiv.innerHTML = '';
+    updateTextarea(editorDiv);
+}
 function strongButtonHandler() {
     const editorDiv = this.closest('form').querySelector('.editor');
     document.execCommand('bold', false, null);
@@ -149,6 +163,11 @@ function imgButtonHandler() {
     imgInput.click();
 }
 
+function txtButtonHandler() {
+    const txtInput = this.closest('form').querySelector('.txt-input');
+    txtInput.click();
+}
+
 function imgInputChangeHandler(event) {
     const file = event.target.files[0];
     if (file && isValidImageType(file.type)) {
@@ -181,7 +200,7 @@ function imgInputChangeHandler(event) {
                 canvas.height = height;
                 ctx.drawImage(img, 0, 0, width, height);
 
-                const dataURL = canvas.toDataURL('image/png'); // Или другой формат, если нужно
+                const dataURL = canvas.toDataURL('image/png');
                 const editorDiv = event.target.closest('form').querySelector('.editor');
                 document.execCommand('insertImage', false, dataURL);
                 updateTextarea(editorDiv);
@@ -192,9 +211,36 @@ function imgInputChangeHandler(event) {
         alert('Invalid image type. Please select a JPG, GIF, or PNG image.');
     }
 }
+function txtInputChangeHandler(event) {
+    const file = event.target.files[0];
+    if (file && isValidTextType(file.type) && file.size <= 100 * 1024) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const textContent = e.target.result;
+            const editorDiv = event.target.closest('form').querySelector('.editor');
+            const marker = '<!-- END_PRE_TAG -->';
+            document.execCommand('insertHTML', false, `<br><pre>${textContent}</pre><br>${marker}`);
+            const range = document.createRange();
+            const markerNode = editorDiv.querySelector('pre').nextSibling;
+            range.setStartAfter(markerNode);
+            range.collapse(true);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            updateTextarea(editorDiv);
+        };
+        reader.readAsText(file);
+    } else {
+        alert('Invalid text file type or file is too large. Please select a TXT file under 100KB.');
+    }
+}
 
 function isValidImageType(type) {
     return ['image/jpeg', 'image/gif', 'image/png'].includes(type);
+}
+
+function isValidTextType(type) {
+    return type === 'text/plain';
 }
 
 function validateURL(url) {
@@ -211,6 +257,11 @@ function validateURL(url) {
 }
 
 function updateTextarea(editorDiv) {
+    let content = editorDiv.innerHTML;
+    const marker = '<!-- END_PRE_TAG -->';
+    if (content.includes(marker)) {
+        content = content.replace(marker, '');
+    }
     const textarea = editorDiv.closest('form').querySelector('textarea');
-    textarea.value = editorDiv.innerHTML;
+    textarea.value = content;
 }

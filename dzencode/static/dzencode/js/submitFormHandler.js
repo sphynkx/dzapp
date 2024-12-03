@@ -65,13 +65,15 @@ export function submitFormHandler(event) {
                         <input type="text" name="homepage" placeholder="Homepage">
                     </div>
                     <div class="toolbar">
-                        <button type="button" class="strong-btn">Strong</button>
-                        <button type="button" class="italic-btn">Italic</button>
-                        <button type="button" class="code-btn">Code</button>
-                        <button type="button" class="link-btn">Link</button>
+                        <button type="button" class="strong-btn">B</button>
+                        <button type="button" class="italic-btn">I</button>
+                        <button type="button" class="code-btn">CODE</button>
+                        <button type="button" class="link-btn">LINK</button>
                         <button type="button" class="img-btn">IMG</button>
+                        <button type="button" class="txt-btn">TXT</button>
                     </div>
                     <input type="file" class="img-input" style="display: none;">
+                    <input type="file" class="txt-input" style="display: none;">
                     <div class="editor" contenteditable="true" placeholder="Write your comment here"></div>
                     <textarea name="content" hidden required></textarea>
                     <div class="form-group">
