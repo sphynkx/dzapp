@@ -10,6 +10,7 @@ export function addReplyHandlers() {
         form.addEventListener('submit', submitFormHandler);
     });
     initializeEditorButtons();
+    applyStyles(document); // bugfix for unapplied styles
 }
 
 export function initializeEditorButtons() {
@@ -37,7 +38,6 @@ export function initializeEditorButtons() {
         button.removeEventListener('click', txtButtonHandler);
         button.addEventListener('click', txtButtonHandler);
     });
-
     document.querySelectorAll('.img-input').forEach(function(input) {
         input.removeEventListener('change', imgInputChangeHandler);
         input.addEventListener('change', imgInputChangeHandler);
@@ -68,7 +68,6 @@ function replyHandler(event) {
     const commentForm = event.target.nextElementSibling;
     commentForm.classList.toggle('hidden');
 }
-
 function clearEditor(form) {
     const editorDiv = form.querySelector('.editor');
     editorDiv.innerHTML = '';
@@ -91,7 +90,6 @@ function codeButtonHandler() {
     document.execCommand('insertHTML', false, `<code>${document.getSelection().toString()}</code>`);
     updateTextarea(editorDiv);
 }
-
 function linkButtonHandler() {
     const editorDiv = this.closest('form').querySelector('.editor');
     const selection = window.getSelection();
@@ -157,7 +155,6 @@ function linkButtonHandler() {
         alert('Please select the text you want to turn into a link.');
     }
 }
-
 function imgButtonHandler() {
     const imgInput = this.closest('form').querySelector('.img-input');
     imgInput.click();
@@ -264,4 +261,10 @@ function updateTextarea(editorDiv) {
     }
     const textarea = editorDiv.closest('form').querySelector('textarea');
     textarea.value = content;
+}
+
+function applyStyles() {
+    //Bugfix - styles didnt apply immendiately after comment creation
+    document.querySelectorAll('.comment-content img').forEach(img => img.classList.add('comment-content'));
+    document.querySelectorAll('.comment-content pre').forEach(pre => pre.classList.add('comment-content'));
 }

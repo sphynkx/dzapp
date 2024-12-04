@@ -54,7 +54,9 @@ export function submitFormHandler(event) {
                 <a href="${comment.homepage}" target="_blank">🏠</a>
                 <a href="mailto:${comment.email}" target="_blank">✉️</a>
                 (${comment.published_date} ${comment.published_time.split('.')[0]}):
-                <p>${comment.content}</p>
+                <div class="comment-content">
+                    <p>${comment.content}</p>
+                </div>
                 <button class="reply-btn">Reply</button>
                 <form action="${addCommentURL}" method="post" class="comment-form hidden">
                     <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
@@ -86,6 +88,7 @@ export function submitFormHandler(event) {
             addReplyHandlers(); // Reply buttons for root posts
 
             initializeEditorButtons();
+            applyStyles(commentElement); // Apply styles immediately
 
             form.classList.add('hidden');
         } else {
@@ -108,4 +111,10 @@ export function submitFormHandler(event) {
 function validateEmail(email) {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailPattern.test(email);
+}
+
+function applyStyles(commentElement) {
+    // Trigger styles to apply immediately without needing to refresh the page
+    commentElement.querySelectorAll('img').forEach(img => img.classList.add('comment-content'));
+    commentElement.querySelectorAll('pre').forEach(pre => pre.classList.add('comment-content'));
 }
