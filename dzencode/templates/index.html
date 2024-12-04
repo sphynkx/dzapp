@@ -14,6 +14,15 @@
 <body>
 <h2>dzApp</h2>
 
+<button id="add-post-btn">Add Post</button>
+<div id="post-form-container" style="display: none;">
+    <form method="post" action="{% url 'add_post' %}">
+        {% csrf_token %}
+        {{ post_form.as_p }}
+        <button type="submit" name="submit_post">Submit Post</button>
+    </form>
+</div>
+
 <div class="sort-options">
     <label>Sort by: </label>
     <button id="sort-title">Title</button>
@@ -63,5 +72,18 @@
 {% endfor %}
 </div>
 <hr>
+<script>
+    document.getElementById('add-post-btn').onclick = function() {
+        var postFormContainer = document.getElementById('post-form-container');
+        postFormContainer.style.display = postFormContainer.style.display === 'none' ? 'block' : 'none';
+    };
+
+    document.querySelectorAll('.reply-btn').forEach(function(button) {
+        button.addEventListener('click', function(event) {
+            var commentForm = event.target.nextElementSibling;
+            commentForm.classList.toggle('hidden');
+        });
+    });
+</script>
 </body>
 </html>

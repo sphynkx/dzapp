@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from .models import MsgDb, User
-from .forms import CommentForm
+from .forms import CommentForm, PostForm
 from django.utils import timezone
 import logging
 
@@ -34,8 +34,10 @@ def index(request):
         else:
             return JsonResponse({'error': 'Message does not exist'}, status=404)
     else:
-        msgs = MsgDb.objects.select_related('user').filter(is_root=True)  ## display root posts only
-        return render(request, 'index.html', context={'msgs': msgs})
+        msgs = MsgDb.objects.select_related('user').filter(is_root=True).order_by('-published_date', '-published_time')
+        comment_form = CommentForm()
+        post_form = PostForm()
+        return render(request, 'index.html', context={'msgs': msgs, 'comment_form': comment_form, 'post_form': post_form})
 
 def add_comment(request):
     if request.method == 'POST' or request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -93,3 +95,41 @@ def add_comment(request):
         else:
             return JsonResponse({'error': 'Invalid form data'}, status=400)
     return JsonResponse({'error': 'Invalid request method or headers'}, status=400)
+
+def add_post(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data['title']
+            user_name = form.cleaned_data['user_name']
+            password = form.cleaned_data['password']
+            content = form.cleaned_data['content']
+            logger.info(f"Received data - title: {title}, user_name: {user_name}, password: {password}, content: {content}")
+            try:
+                user = User.objects.get(username=user_name)
+                logger.info(f"User found: {user}")
+                if user.check_password(password):
+                    if user.author:
+                        post = MsgDb.objects.create(
+                            title=title,
+                            user=user,
+                            content=content,
+                            is_root=True,
+                            has_child=False
+                        )
+                        post.save()
+                        return redirect('index')
+                    else:
+                        logger.error(f"User {user_name} is not authorized to create posts. user.author: {user.author}")
+                        return JsonResponse({'error': 'User is not authorized to create posts'}, status=400)
+                else:
+                    logger.error(f"Invalid password for user {user_name}.")
+                    return JsonResponse({'error': 'Invalid credentials or unauthorized user'}, status=400)
+            except User.DoesNotExist:
+                logger.error(f"User {user_name} does not exist.")
+                return JsonResponse({'error': 'User does not exist'}, status=400)
+        else:
+            logger.error(f"Invalid form data: {form.errors}")
+            return JsonResponse({'error': 'Invalid form data', 'form_errors': form.errors}, status=400)
+    logger.error(f"Invalid request method: {request.method}")
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

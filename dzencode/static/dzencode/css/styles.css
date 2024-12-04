@@ -132,3 +132,6 @@ button:hover {
 .comment-content pre:hover {
     border-color: blue;
 }
+.sort-options {
+    margin: 20px;
+}

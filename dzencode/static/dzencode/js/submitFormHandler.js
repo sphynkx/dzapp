@@ -88,7 +88,7 @@ export function submitFormHandler(event) {
             addReplyHandlers(); // Reply buttons for root posts
 
             initializeEditorButtons();
-            applyStyles(commentElement); // Apply styles immediately
+            applyStyles(commentElement); // bugfix for unapplied styles
 
             form.classList.add('hidden');
         } else {
@@ -114,7 +114,7 @@ function validateEmail(email) {
 }
 
 function applyStyles(commentElement) {
-    // Trigger styles to apply immediately without needing to refresh the page
+    //Bugfix - styles didnt apply immendiately after comment creation
     commentElement.querySelectorAll('img').forEach(img => img.classList.add('comment-content'));
     commentElement.querySelectorAll('pre').forEach(pre => pre.classList.add('comment-content'));
 }

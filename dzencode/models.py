@@ -1,8 +1,20 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.hashers import make_password, check_password
 
 class User(models.Model):
     username = models.CharField(max_length=50)
+    author = models.BooleanField(default=False)
+    password = models.CharField(max_length=128, default=make_password('defaultpassword'))
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.password)
+
+    def __str__(self):
+        return self.username  # Этот метод отображает имя пользователя вместо объекта
 
 class MsgDb(models.Model):
     title = models.CharField(max_length=255)
