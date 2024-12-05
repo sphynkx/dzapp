@@ -46,9 +46,9 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <input type="hidden" name="parent_id" value="{{ msg.id }}">
-                    <input type="text" name="user_name" placeholder="Name" value="Anonymous" required>
-                    <input type="email" name="email" placeholder="Email" required>
-                    <input type="text" name="homepage" placeholder="Homepage">
+                    <input type="text" name="user_name" id="id_user_name_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" placeholder="Name" value="Anonymous" required>
+                    <input type="email" name="email" id="id_email_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" placeholder="Email" required>
+                    <input type="text" name="homepage" id="id_homepage_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" placeholder="Homepage">
                 </div>
                 <div class="toolbar">
                     <button type="button" class="strong-btn">B</button>
@@ -60,13 +60,48 @@
                 </div>
                 <input type="file" class="img-input" style="display: none;">
                 <input type="file" class="txt-input" style="display: none;">
-                <div class="editor" contenteditable="true" placeholder="Write your comment here"></div>
-                <textarea name="content" hidden required></textarea>
+                <div class="editor" contenteditable="true" placeholder="Write your comment here" id="editor_{{ forloop.parentloop.counter }}_{{ forloop.counter }}"></div>
+                <textarea name="content" hidden required id="id_content_{{ forloop.parentloop.counter }}_{{ forloop.counter }}"></textarea>
                 <div class="form-group">
                     <button type="submit" title="Roote">Send</button>
                 </div>
             </form>
-            <div class="comments"></div>
+            <div class="comments">
+                {% for comment in msg.comments.all %}
+                <div class="comment" data-id="{{ comment.id }}">
+                    <strong>{{ comment.user.username }}</strong>
+                    <a href="{{ comment.user.homepage }}" target="_blank">🏠</a>
+                    <a href="mailto:{{ comment.user.email }}" target="_blank">✉️</a>
+                    ({{ comment.published_date }} {{ comment.published_time|slice:":5" }}):
+                    <div class="comment-content">
+                        <p>{{ comment.content }}</p>
+                    </div>
+                    <button class="reply-btn">Reply</button>
+                    <form method="post" action="{% url 'add_comment' %}" class="comment-form hidden">
+                        {% csrf_token %}
+                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                        <input type="text" name="user_name" id="id_user_name_{{ forloop.parentloop.parentloop.counter }}_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" placeholder="Name" value="Anonymous" required>
+                        <input type="email" name="email" id="id_email_{{ forloop.parentloop.parentloop.counter }}_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" placeholder="Email" required>
+                        <input type="text" name="homepage" id="id_homepage_{{ forloop.parentloop.parentloop.counter }}_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" placeholder="Homepage">
+                        <div class="toolbar">
+                            <button type="button" class="strong-btn">B</button>
+                            <button type="button" class="italic-btn">I</button>
+                            <button type="button" class="code-btn">CODE</button>
+                            <button type="button" class="link-btn">LINK</button>
+                            <button type="button" class="img-btn">IMG</button>
+                            <button type="button" class="txt-btn">TXT</button>
+                        </div>
+                        <input type="file" class="img-input" style="display: none;">
+                        <input type="file" class="txt-input" style="display: none;">
+                        <div class="editor" contenteditable="true" placeholder="Write your comment here" id="editor_{{ forloop.parentloop.parentloop.counter }}_{{ forloop.parentloop.counter }}_{{ forloop.counter }}"></div>
+                        <textarea name="content" hidden required id="id_content_{{ forloop.parentloop.parentloop.counter }}_{{ forloop.parentloop.counter }}_{{ forloop.counter }}"></textarea>
+                        <div class="form-group">
+                            <button type="submit" title="Roote">Send</button>
+                        </div>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 {% endfor %}

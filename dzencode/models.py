@@ -5,7 +5,12 @@ from django.contrib.auth.hashers import make_password, check_password
 class User(models.Model):
     username = models.CharField(max_length=50)
     author = models.BooleanField(default=False)
+    email = models.EmailField(blank=True, null=True)
+    homepage = models.URLField(blank=True, null=True)
     password = models.CharField(max_length=128, default=make_password('defaultpassword'))
+
+    class Meta:
+        unique_together = ('username', 'email', 'homepage')
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
@@ -14,7 +19,7 @@ class User(models.Model):
         return check_password(raw_password, self.password)
 
     def __str__(self):
-        return self.username  # Этот метод отображает имя пользователя вместо объекта
+        return self.username
 
 class MsgDb(models.Model):
     title = models.CharField(max_length=255)

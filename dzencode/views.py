@@ -17,6 +17,8 @@ def index(request):
                     'id': comment.id,
                     'content': comment.content,
                     'user__username': comment.user.username,
+                    'email': comment.user.email,
+                    'homepage': comment.user.homepage,
                     'published_date': comment.published_date.strftime('%Y-%m-%d'),
                     'published_time': comment.published_time.strftime('at %H:%M:%S'),
                     'has_child': comment.has_child,
@@ -45,16 +47,21 @@ def add_comment(request):
         if form.is_valid():
             content = form.cleaned_data['content']
             user_name = form.cleaned_data['user_name']
-            email = request.POST.get('email')
-            homepage = request.POST.get('homepage')
+            email = form.cleaned_data['email']
+            homepage = form.cleaned_data['homepage']
             parent_id = request.POST.get('parent_id')
 
             try:
-                parent = MsgDb.objects.get(id=parent_id) if parent_id else None  ## consider as root post
+                parent = MsgDb.objects.get(id=parent_id) if parent_id else None
             except MsgDb.DoesNotExist:
                 return JsonResponse({'error': 'Parent comment does not exist'}, status=400)
 
-            user, created = User.objects.get_or_create(username=user_name)
+            user, created = User.objects.get_or_create(username=user_name, email=email, homepage=homepage)
+
+            if created:
+                user.email = email
+                user.homepage = homepage
+                user.save()
 
             comment = MsgDb.objects.create(
                 title=f"Comment by {user.username}",
@@ -63,8 +70,8 @@ def add_comment(request):
                 published_time=timezone.now().time(),
                 content=content,
                 parent=parent,
-                is_root=False,  ## consider as comment
-                has_child=False  ## default value for new posts/comments
+                is_root=False,
+                has_child=False
             )
             if parent:
                 parent.has_child = True
@@ -75,8 +82,8 @@ def add_comment(request):
                     'id': comment.id,
                     'content': comment.content,
                     'user__username': comment.user.username,
-                    'email': email,
-                    'homepage': homepage,
+                    'email': comment.user.email,
+                    'homepage': comment.user.homepage,
                     'published_date': comment.published_date.strftime('%Y-%m-%d'),
                     'published_time': comment.published_time.strftime('at %H:%M:%S'),
                     'has_child': comment.has_child,
