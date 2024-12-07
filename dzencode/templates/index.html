@@ -6,6 +6,7 @@
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'dzencode/css/styles.css' %}">
     <script src="{% static 'dzencode/js/main.js' %}" type="module" defer></script>
+    <script type="module" src="{% static 'dzencode/js/addPostHandler.js' %}" defer></script>
     <script>
         const addCommentURL = "{% url 'add_comment' %}";
         const csrfToken = "{{ csrf_token }}";

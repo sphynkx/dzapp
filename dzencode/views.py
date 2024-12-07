@@ -122,9 +122,20 @@ def add_post(request):
                             user=user,
                             content=content,
                             is_root=True,
-                            has_child=False
+                            has_child=False,
+                            published_date=timezone.now().date(),
+                            published_time=timezone.now().time()
                         )
-                        post.save()
+                        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                            data = {
+                                'id': post.id,
+                                'title': post.title,
+                                'user_name': post.user.username,
+                                'date': post.published_date.strftime('%Y-%m-%d'),
+                                'time': post.published_time.strftime('%H:%M:%S'),
+                                'content': post.content,
+                            }
+                            return JsonResponse(data)
                         return redirect('index')
                     else:
                         logger.error(f"User {user_name} is not authorized to create posts. user.author: {user.author}")
