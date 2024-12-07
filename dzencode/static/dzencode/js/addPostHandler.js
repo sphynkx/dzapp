@@ -33,6 +33,10 @@ function handleAddPostFormSubmit(event) {
             appendNewPostToPage(data);
             document.getElementById('post-form-container').style.display = 'none';
             clearAddPostForm();
+            //Reload page. Freshly created post didnt expand correctly. Only after page reload.
+            setTimeout(() => {
+                window.location.reload();
+            }, 4);
         }
     })
     .catch(error => console.error('Error submitting post form:', error));
@@ -88,7 +92,7 @@ function handlePostToggle(event) {
                 console.log('Classes after removing active:', post.className);
             }
         });
-        //currentPost.classList.add('active'); //conflicts with same one from fatchData.js
+        //currentPost.classList.add('active'); //conflicts with same one from fetchData.js
         console.log('Classes after opening:', currentPost.className);
     }
 }
