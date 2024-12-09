@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 from .models import MsgDb, User
 from .forms import CommentForm, PostForm
 from django.utils import timezone
@@ -151,3 +151,31 @@ def add_post(request):
             return JsonResponse({'error': 'Invalid form data', 'form_errors': form.errors}, status=400)
     logger.error(f"Invalid request method: {request.method}")
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+def get_comments_tree(comment):
+    return {
+        'id': comment.id,
+        'content': comment.content,
+        'user__username': comment.user.username,
+        'email': comment.user.email,
+        'homepage': comment.user.homepage,
+        'published_date': comment.published_date.strftime('%Y-%m-%d'),
+        'published_time': comment.published_time.strftime('%H:%M:%S'),
+        'children': [get_comments_tree(c) for c in comment.comments.all()] if comment.comments.exists() else []
+    }
+
+def get_post_by_id(request, post_id):
+    try:
+        post = MsgDb.objects.get(id=post_id)
+        data = {
+            'id': post.id,
+            'title': post.title,
+            'message': post.content,
+            'user_name': post.user.username,
+            'date': post.published_date.strftime('%Y-%m-%d'),
+            'time': post.published_time.strftime('%H:%M:%S'),
+            'comments': [get_comments_tree(c) for c in post.comments.filter(is_root=False)]
+        }
+        return JsonResponse(data)
+    except MsgDb.DoesNotExist:
+        return HttpResponseNotFound("Post not found")

@@ -6,9 +6,9 @@ export function renderComments(comments, container) {
         commentElement.classList.add('comment');
         commentElement.dataset.id = comment.id;
         commentElement.innerHTML = `
-            <strong>${comment.user__username}</strong>
-            <a href="${comment.homepage}" target="_blank">🏠</a>
-            <a href="mailto:${comment.email}" target="_blank">✉️</a>
+            <strong>${comment.user__username || 'Anonymous'}</strong>
+            <a href="${comment.homepage || '#'}" target="_blank">🏠</a>
+            <a href="mailto:${comment.email || '#'}" target="_blank">✉️</a>
             (${comment.published_date} ${comment.published_time.split('.')[0]}):
             <div class="comment-content">
                 <p>${comment.content}</p>
@@ -41,7 +41,11 @@ export function renderComments(comments, container) {
             <div class="comments"></div>
         `;
         container.appendChild(commentElement);
-        renderComments(comment.children, commentElement.querySelector('.comments'));
+
+        if (comment.children && comment.children.length > 0) {
+            const childrenContainer = commentElement.querySelector('.comments');
+            renderComments(comment.children, childrenContainer);
+        }
 
         initializeEditorButtons();
     });

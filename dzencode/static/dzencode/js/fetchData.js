@@ -2,7 +2,7 @@ import { renderComments } from './renderComments.js';
 import { addReplyHandlers } from './replyHandler.js';
 
 export function fetchData(event) {
-    const title = event.target.name;
+    const postId = event.target.dataset.id;
     const cur_post = event.target.closest('h3').nextElementSibling;
 
     // Toggle click to post
@@ -15,7 +15,7 @@ export function fetchData(event) {
         return;
     }
 
-    // clean all fields..
+    // Clean all fields
     document.querySelectorAll('.msg-output').forEach(function(cur_post) {
         cur_post.classList.remove('active');
         cur_post.querySelector('.msg-content').innerText = '';
@@ -24,7 +24,7 @@ export function fetchData(event) {
         cur_post.querySelector('.comments').innerHTML = '';
     });
 
-    fetch(`/?title=${title}`, {
+    fetch(`/api/posts/${postId}/`, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(response => response.json())
@@ -39,7 +39,7 @@ export function fetchData(event) {
         cur_post.querySelector('.msg-date-time').innerText = `(${data.date} ${data.time.split('.')[0]})`;
 
         const commentsContainer = cur_post.querySelector('.comments');
-        renderComments(data.comments, commentsContainer);
+        renderComments(data.comments || [], commentsContainer);
         addReplyHandlers(); // Reply buttons for root posts
     })
     .catch(error => console.error('Error:', error));

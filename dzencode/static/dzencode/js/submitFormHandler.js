@@ -114,7 +114,7 @@ function validateEmail(email) {
 }
 
 function applyStyles(commentElement) {
-    //Bugfix - styles didnt apply immendiately after comment creation
+    //Bugfix - styles didn't apply immediately after comment creation
     commentElement.querySelectorAll('img').forEach(img => img.classList.add('comment-content'));
     commentElement.querySelectorAll('pre').forEach(pre => pre.classList.add('comment-content'));
 }

@@ -48,7 +48,7 @@ function appendNewPostToPage(post) {
     postElement.classList.add('msg-item');
     postElement.innerHTML = `
         <h3>
-            <a href="#" name="${post.title}">${post.title}</a>
+            <a href="#" data-id="${post.id}">${post.title}</a>
             <span class="msg-aftertitle">by <strong>${post.user_name}</strong> (${post.date} at ${post.time})</span>
         </h3>
         <div class="msg-output" data-id="${post.id}" style="border: 1px solid green; max-height:400px; width:90%; overflow-x:hidden; overflow-y: auto; margin-left:50px;">
