@@ -9,6 +9,7 @@
     <script type="module" src="{% static 'dzencode/js/addPostHandler.js' %}" defer></script>
     <script>
         const addCommentURL = "{% url 'add_comment' %}";
+        const addPostURL = "{% url 'add_post' %}";
         const csrfToken = "{{ csrf_token }}";
     </script>
 </head>
@@ -17,10 +18,30 @@
 
 <button id="add-post-btn">Add Post</button>
 <div id="post-form-container" style="display: none;">
-    <form method="post" action="{% url 'add_post' %}">
+    <form method="post" action="{% url 'add_post' %}" id="post-form">
         {% csrf_token %}
-        {{ post_form.as_p }}
-        <button type="submit" name="submit_post">Submit Post</button>
+        <div class="form-group">
+            {{ post_form.title }}
+        </div>
+        <div class="form-group">
+            <input type="text" name="user_name" placeholder="Your Name" required autocomplete="username">
+            <input type="password" name="password" placeholder="Password" required autocomplete="current-password">
+        </div>
+        <div class="toolbar">
+            <button type="button" class="strong-btn">B</button>
+            <button type="button" class="italic-btn">I</button>
+            <button type="button" class="code-btn">CODE</button>
+            <button type="button" class="link-btn">LINK</button>
+            <button type="button" class="img-btn">IMG</button>
+            <button type="button" class="txt-btn">TXT</button>
+        </div>
+        <input type="file" class="img-input" style="display: none;">
+        <input type="file" class="txt-input" style="display: none;">
+        <div class="editor" contenteditable="true" placeholder="Write your post here"></div>
+        <textarea name="content" hidden required></textarea>
+        <div class="form-group">
+            <button type="submit" name="submit_post">Submit Post</button>
+        </div>
     </form>
 </div>
 

@@ -96,6 +96,40 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    function imgButtonHandler() {
+        const editorDiv = this.closest('form').querySelector('.editor');
+        const fileInput = this.nextElementSibling;
+        fileInput.click();
+
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                document.execCommand('insertHTML', false, img.outerHTML);
+                updateTextarea(editorDiv);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function txtButtonHandler() {
+        const editorDiv = this.closest('form').querySelector('.editor');
+        const fileInput = this.nextElementSibling;
+        fileInput.click();
+
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.execCommand('insertHTML', false, `<pre>${e.target.result}</pre>`);
+                updateTextarea(editorDiv);
+            };
+            reader.readAsText(file);
+        });
+    }
+
     function updateTextarea(editorDiv) {
         const textarea = editorDiv.closest('form').querySelector('textarea');
         textarea.value = editorDiv.innerHTML;
@@ -112,6 +146,12 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     document.querySelectorAll('.link-btn').forEach(function(button) {
         button.addEventListener('click', linkButtonHandler);
+    });
+    document.querySelectorAll('.img-btn').forEach(function(button) {
+        button.addEventListener('click', imgButtonHandler);
+    });
+    document.querySelectorAll('.txt-btn').forEach(function(button) {
+        button.addEventListener('click', txtButtonHandler);
     });
 
     window.initializeEditorButtons = function() {
@@ -130,6 +170,14 @@ document.addEventListener("DOMContentLoaded", function() {
         document.querySelectorAll('.link-btn').forEach(function(button) {
             button.removeEventListener('click', linkButtonHandler);
             button.addEventListener('click', linkButtonHandler);
+        });
+        document.querySelectorAll('.img-btn').forEach(function(button) {
+            button.removeEventListener('click', imgButtonHandler);
+            button.addEventListener('click', imgButtonHandler);
+        });
+        document.querySelectorAll('.txt-btn').forEach(function(button) {
+            button.removeEventListener('click', txtButtonHandler);
+            button.addEventListener('click', txtButtonHandler);
         });
 
         document.querySelectorAll('.editor').forEach(function(editorDiv) {
