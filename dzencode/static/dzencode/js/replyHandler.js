@@ -77,7 +77,7 @@ function clearEditor(form) {
 }
 
 function applyStyles() {
-    //Bugfix - styles didn't apply immediately after comment creation
+    // Bugfix - styles didn't apply immediately after comment creation
     document.querySelectorAll('.comment-content img').forEach(img => img.classList.add('comment-content'));
     document.querySelectorAll('.comment-content pre').forEach(pre => pre.classList.add('comment-content'));
 }

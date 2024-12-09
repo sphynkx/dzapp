@@ -20,16 +20,15 @@ def index(request):
                     'email': comment.user.email,
                     'homepage': comment.user.homepage,
                     'published_date': comment.published_date.strftime('%Y-%m-%d'),
-                    'published_time': comment.published_time.strftime('at %H:%M:%S'),
-                    'has_child': comment.has_child,
-                    'children': [get_comments_tree(c) for c in comment.comments.all()]
+                    'published_time': comment.published_time.strftime('%H:%M:%S'),
+                    'children': [get_comments_tree(c) for c in comment.comments.all()] if comment.comments.exists() else []
                 }
             data = {
                 'message': msg.content,
                 'title': msg.title,
                 'user_name': msg.user.username,
                 'date': msg.published_date.strftime('%Y-%m-%d'),
-                'time': msg.published_time.strftime('at %H:%M:%S'),
+                'time': msg.published_time.strftime('%H:%M:%S'),
                 'comments': [get_comments_tree(c) for c in msg.comments.filter(is_root=False)]
             }
             return JsonResponse(data)
@@ -85,7 +84,7 @@ def add_comment(request):
                     'email': comment.user.email,
                     'homepage': comment.user.homepage,
                     'published_date': comment.published_date.strftime('%Y-%m-%d'),
-                    'published_time': comment.published_time.strftime('at %H:%M:%S'),
+                    'published_time': comment.published_time.strftime('%H:%M:%S'),
                     'has_child': comment.has_child,
                     'children': []
                 }
@@ -166,11 +165,11 @@ def get_comments_tree(comment):
 
 def get_post_by_id(request, post_id):
     try:
-        post = MsgDb.objects.get(id=post_id)
+        post = MsgDb.objects.get(id=post_id)  # Updated to use MsgDb
         data = {
             'id': post.id,
             'title': post.title,
-            'message': post.content,
+            'message': post.content,  # Updated to use post.content
             'user_name': post.user.username,
             'date': post.published_date.strftime('%Y-%m-%d'),
             'time': post.published_time.strftime('%H:%M:%S'),

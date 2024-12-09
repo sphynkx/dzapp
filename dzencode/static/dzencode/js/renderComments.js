@@ -5,6 +5,8 @@ export function renderComments(comments, container) {
         const commentElement = document.createElement('div');
         commentElement.classList.add('comment');
         commentElement.dataset.id = comment.id;
+        console.log('Rendering comment:', comment.id, comment);
+
         commentElement.innerHTML = `
             <strong>${comment.user__username || 'Anonymous'}</strong>
             <a href="${comment.homepage || '#'}" target="_blank">🏠</a>
