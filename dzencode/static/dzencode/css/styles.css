@@ -135,3 +135,19 @@ button:hover {
 .sort-options {
     margin: 20px;
 }
+.msg-content img {
+    border: 2px solid transparent;
+    padding: 2px;
+}
+.msg-content img:hover {
+    border-color: red;
+}
+.msg-content pre {
+    border: 2px solid transparent;
+    padding: 2px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+.msg-content pre:hover {
+    border-color: blue;
+}

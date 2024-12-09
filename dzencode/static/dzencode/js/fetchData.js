@@ -8,7 +8,7 @@ export function fetchData(event) {
     // Toggle click to post
     if (cur_post.classList.contains('active')) {
         cur_post.classList.remove('active');
-        cur_post.querySelector('.msg-content').innerText = '';
+        cur_post.querySelector('.msg-content').innerHTML = '';
         cur_post.querySelector('.msg-user').innerText = '';
         cur_post.querySelector('.msg-date-time').innerText = '';
         cur_post.querySelector('.comments').innerHTML = '';
@@ -18,7 +18,7 @@ export function fetchData(event) {
     // Clean all fields
     document.querySelectorAll('.msg-output').forEach(function(cur_post) {
         cur_post.classList.remove('active');
-        cur_post.querySelector('.msg-content').innerText = '';
+        cur_post.querySelector('.msg-content').innerHTML = '';
         cur_post.querySelector('.msg-user').innerText = '';
         cur_post.querySelector('.msg-date-time').innerText = '';
         cur_post.querySelector('.comments').innerHTML = '';
@@ -34,7 +34,7 @@ export function fetchData(event) {
             return;
         }
         cur_post.classList.add('active');
-        cur_post.querySelector('.msg-content').innerText = data.message;
+        cur_post.querySelector('.msg-content').innerHTML = data.message;
         cur_post.querySelector('.msg-user').innerText = data.user_name;
         cur_post.querySelector('.msg-date-time').innerText = `(${data.date} ${data.time.split('.')[0]})`;
 

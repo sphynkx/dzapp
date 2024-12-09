@@ -109,7 +109,7 @@ def add_post(request):
             title = form.cleaned_data['title']
             user_name = form.cleaned_data['user_name']
             password = form.cleaned_data['password']
-            content = form.cleaned_data['content']
+            content = form.cleaned_data['content']  # Убедитесь, что HTML форматирование сохраняется
             logger.info(f"Received data - title: {title}, user_name: {user_name}, password: {password}, content: {content}")
             try:
                 user = User.objects.get(username=user_name)

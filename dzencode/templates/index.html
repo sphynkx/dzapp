@@ -62,7 +62,7 @@
         <div class="msg-output" data-id="{{ msg.id }}" style="border: 1px solid green; max-height:400px; width:90%; overflow-x:hidden; overflow-y: auto; margin-left:50px;">
             <span class="msg-user" title="{{ msg.user.username }}"></span>
             <span class="msg-date-time"></span>
-            <div class="msg-content"></div>
+            <div class="msg-content">{{ msg.content|safe }}</div>
             <button class="reply-btn">Reply</button>
             <form action="{% url 'add_comment' %}" method="post" class="comment-form hidden">
                 {% csrf_token %}
@@ -96,7 +96,7 @@
                     <a href="mailto:{{ comment.user.email }}" target="_blank">✉️</a>
                     ({{ comment.published_date }} {{ comment.published_time|slice:":5" }}):
                     <div class="comment-content">
-                        <p>{{ comment.content }}</p>
+                        <p>{{ comment.content|safe }}</p>
                     </div>
                     <button class="reply-btn">Reply</button>
                     <form method="post" action="{% url 'add_comment' %}" class="comment-form hidden">
