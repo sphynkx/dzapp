@@ -96,7 +96,7 @@
                     <a href="mailto:{{ comment.user.email }}" target="_blank">✉️</a>
                     ({{ comment.published_date }} {{ comment.published_time|slice:":5" }}):
                     <div class="comment-content">
-                        <p>{{ comment.content|safe }}</p>
+                        {{ comment.content|safe }}
                     </div>
                     <button class="reply-btn">Reply</button>
                     <form method="post" action="{% url 'add_comment' %}" class="comment-form hidden">

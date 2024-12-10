@@ -35,6 +35,8 @@
     border: 1px solid red;
     padding: 10px;
     margin-top: 5px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 .form-group {
     margin-bottom: 10px;
@@ -51,6 +53,7 @@ textarea {
     border-left: 1px solid lightgray;
     padding-left: 10px;
     margin-top: 5px;
+    box-sizing: border-box;
 }
 .comment p {
     margin: 0;
@@ -60,6 +63,8 @@ textarea {
     padding: 10px;
     margin: 10px 0;
     background-color: ghostwhite;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 .reply-btn {
     margin-top: 10px;
@@ -116,38 +121,27 @@ button:hover {
     background-color: lightgray;
     cursor: not-allowed;
 }
-.comment-content img {
+.comment-content img, .msg-content img {
+    float: right;
+    margin: 10px 0 10px 10px;
+    max-width: 30%;
+    height: auto;
     border: 2px solid transparent;
     padding: 2px;
+    box-sizing: border-box;
 }
-.comment-content img:hover {
+.comment-content img:hover, .msg-content img:hover {
     border-color: red;
 }
-.comment-content pre {
+.comment-content pre, .msg-content pre {
     border: 2px solid transparent;
     padding: 2px;
     white-space: pre-wrap;
     word-wrap: break-word;
 }
-.comment-content pre:hover {
+.comment-content pre:hover, .msg-content pre:hover {
     border-color: blue;
 }
 .sort-options {
     margin: 20px;
-}
-.msg-content img {
-    border: 2px solid transparent;
-    padding: 2px;
-}
-.msg-content img:hover {
-    border-color: red;
-}
-.msg-content pre {
-    border: 2px solid transparent;
-    padding: 2px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-.msg-content pre:hover {
-    border-color: blue;
 }
