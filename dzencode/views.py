@@ -4,6 +4,9 @@ from .models import MsgDb, User
 from .forms import CommentForm, PostForm
 from django.utils import timezone
 import logging
+from captcha.models import CaptchaStore
+from captcha.helpers import captcha_image_url
+from django.http import JsonResponse
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +43,37 @@ def index(request):
         post_form = PostForm()
         return render(request, 'index.html', context={'msgs': msgs, 'comment_form': comment_form, 'post_form': post_form})
 
+
+
+def generate_captcha_view(request):
+    captcha_key, captcha_image_url_value = generate_captcha()
+    return JsonResponse({'captcha_image_url': captcha_image_url_value})
+
+def generate_captcha():
+    try:
+        captcha_key = CaptchaStore.generate_key()
+        captcha_image_url_value = captcha_image_url(captcha_key)
+        return captcha_key, captcha_image_url_value
+    except Exception as e:
+        logger.error(f"Error generating captcha: {e}")
+        return None, ''
+
+def get_comment_data(comment):
+    captcha_key, captcha_image_url_value = generate_captcha()
+
+    return {
+        'id': comment.id,
+        'content': comment.content,
+        'user__username': comment.user.username,
+        'email': comment.user.email,
+        'homepage': comment.user.homepage,
+        'published_date': comment.published_date.strftime('%Y-%m-%d'),
+        'published_time': comment.published_time.strftime('%H:%M:%S'),
+        'captcha_key': captcha_key,
+        'captcha_image_url': captcha_image_url_value,
+        'children': [get_comment_data(c) for c in comment.comments.all()] if comment.comments.exists() else []
+    }
+
 def add_comment(request):
     if request.method == 'POST' or request.headers.get('x-requested-with') == 'XMLHttpRequest':
         form = CommentForm(request.POST)
@@ -48,6 +82,7 @@ def add_comment(request):
             user_name = form.cleaned_data['user_name']
             email = form.cleaned_data['email']
             homepage = form.cleaned_data['homepage']
+            captcha = form.cleaned_data['captcha']
             parent_id = request.POST.get('parent_id')
 
             try:
@@ -76,31 +111,26 @@ def add_comment(request):
                 parent.has_child = True
                 parent.save()
 
-            def get_comment_data(comment):
-                return {
-                    'id': comment.id,
-                    'content': comment.content,
-                    'user__username': comment.user.username,
-                    'email': comment.user.email,
-                    'homepage': comment.user.homepage,
-                    'published_date': comment.published_date.strftime('%Y-%m-%d'),
-                    'published_time': comment.published_time.strftime('%H:%M:%S'),
-                    'has_child': comment.has_child,
-                    'children': []
-                }
+            comment_data = get_comment_data(comment)
+            if comment_data is None:
+                return JsonResponse({'error': 'Failed to generate captcha'}, status=500)
 
             data = {
                 'parent_id': parent_id,
-                'comment': get_comment_data(comment)
+                'comment': comment_data
             }
+
+            logger.info(f"Comment Data: {data}")
 
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return JsonResponse(data)
             else:
                 return redirect('/')
         else:
-            return JsonResponse({'error': 'Invalid form data'}, status=400)
+            return JsonResponse({'error': 'Invalid form data', 'form_errors': form.errors}, status=400)
     return JsonResponse({'error': 'Invalid request method or headers'}, status=400)
+
+
 
 def add_post(request):
     if request.method == 'POST':
@@ -165,11 +195,11 @@ def get_comments_tree(comment):
 
 def get_post_by_id(request, post_id):
     try:
-        post = MsgDb.objects.get(id=post_id)  # Updated to use MsgDb
+        post = MsgDb.objects.get(id=post_id)
         data = {
             'id': post.id,
             'title': post.title,
-            'message': post.content,  # Updated to use post.content
+            'message': post.content,
             'user_name': post.user.username,
             'date': post.published_date.strftime('%Y-%m-%d'),
             'time': post.published_time.strftime('%H:%M:%S'),

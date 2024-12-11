@@ -1,11 +1,29 @@
 import { addReplyHandlers, initializeEditorButtons } from './replyHandler.js';
 
-export function renderComments(comments, container) {
-    comments.forEach(comment => {
+async function generateCaptcha() {
+    try {
+        const response = await fetch('/generate_captcha/');
+        const data = await response.json();
+        return data.captcha_image_url;
+    } catch (error) {
+        console.error('Error generating captcha:', error);
+        return '';
+    }
+}
+
+export async function renderComments(comments, container) {
+    for (const comment of comments) {
         const commentElement = document.createElement('div');
         commentElement.classList.add('comment');
         commentElement.dataset.id = comment.id;
         console.log('Rendering comment:', comment.id, comment);
+
+        const captchaImageUrl = await generateCaptcha();
+        console.log('Captcha Image URL:', captchaImageUrl);
+
+        if (!captchaImageUrl) {
+            console.error('Captcha image URL is empty!');
+        }
 
         commentElement.innerHTML = `
             <strong>${comment.user__username || 'Anonymous'}</strong>
@@ -37,6 +55,10 @@ export function renderComments(comments, container) {
                 <div class="editor" contenteditable="true" placeholder="Write your comment here"></div>
                 <textarea name="content" hidden required></textarea>
                 <div class="form-group">
+                    <img src="${captchaImageUrl}" alt="Captcha Image" class="captcha-image">
+                    <input type="text" name="captcha" class="captcha" required placeholder="Enter Captcha">
+                </div>
+                <div class="form-group">
                     <button type="submit" title="Childe2">Send</button>
                 </div>
             </form>
@@ -50,5 +72,6 @@ export function renderComments(comments, container) {
         }
 
         initializeEditorButtons();
-    });
+        addReplyHandlers();
+    }
 }

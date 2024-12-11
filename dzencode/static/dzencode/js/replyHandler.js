@@ -68,7 +68,23 @@ function replyHandler(event) {
     });
     const commentForm = event.target.nextElementSibling;
     commentForm.classList.toggle('hidden');
+
+    var captchaField = commentForm.querySelector('.captcha');
+    if (!captchaField) {
+        console.error('Captcha field not found!');
+        initializeCaptcha(commentForm);
+    } else {
+        console.log('Captcha field found:', captchaField);
+    }
 }
+
+function initializeCaptcha(form) {
+    console.log('Initializing captcha for form:', form);
+}
+
+document.querySelectorAll('.reply-btn').forEach(function(button) {
+    button.addEventListener('click', replyHandler);
+});
 
 function clearEditor(form) {
     const editorDiv = form.querySelector('.editor');

@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'dzencode/css/styles.css' %}">
     <script src="{% static 'dzencode/js/main.js' %}" type="module" defer></script>
     <script type="module" src="{% static 'dzencode/js/addPostHandler.js' %}" defer></script>
+    <script type="module" src="{% static 'dzencode/js/replyHandler.js' %}" defer></script>
     <script>
         const addCommentURL = "{% url 'add_comment' %}";
         const addPostURL = "{% url 'add_post' %}";
@@ -64,13 +65,13 @@
             <span class="msg-date-time"></span>
             <div class="msg-content">{{ msg.content|safe }}</div>
             <button class="reply-btn">Reply</button>
-            <form action="{% url 'add_comment' %}" method="post" class="comment-form hidden">
+            <form action="{% url 'add_comment' %}" method="post" class="comment-form hidden" id="root-comment-form-{{ msg.id }}">
                 {% csrf_token %}
                 <div class="form-group">
                     <input type="hidden" name="parent_id" value="{{ msg.id }}">
-                    <input type="text" name="user_name" id="id_user_name_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" placeholder="Name" value="Anonymous" required>
-                    <input type="email" name="email" id="id_email_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" placeholder="Email" required>
-                    <input type="text" name="homepage" id="id_homepage_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" placeholder="Homepage">
+                    <input type="text" name="user_name" id="id_user_name_{{ msg.id }}" placeholder="Name" value="Anonymous" required>
+                    <input type="email" name="email" id="id_email_{{ msg.id }}" placeholder="Email" required>
+                    <input type="text" name="homepage" id="id_homepage_{{ msg.id }}" placeholder="Homepage">
                 </div>
                 <div class="toolbar">
                     <button type="button" class="strong-btn">B</button>
@@ -82,10 +83,13 @@
                 </div>
                 <input type="file" class="img-input" style="display: none;">
                 <input type="file" class="txt-input" style="display: none;">
-                <div class="editor" contenteditable="true" placeholder="Write your comment here" id="editor_{{ forloop.parentloop.counter }}_{{ forloop.counter }}"></div>
-                <textarea name="content" hidden required id="id_content_{{ forloop.parentloop.counter }}_{{ forloop.counter }}"></textarea>
+                <div class="editor" contenteditable="true" placeholder="Write your comment here" id="editor_{{ msg.id }}"></div>
+                <textarea name="content" hidden required id="id_content_{{ msg.id }}"></textarea>
                 <div class="form-group">
-                    <button type="submit" title="Roote">Send</button>
+                    {{ comment_form.captcha }}
+                </div>
+                <div class="form-group">
+                    <button type="submit" title="Roote1">Send</button>
                 </div>
             </form>
             <div class="comments">
@@ -99,12 +103,12 @@
                         {{ comment.content|safe }}
                     </div>
                     <button class="reply-btn">Reply</button>
-                    <form method="post" action="{% url 'add_comment' %}" class="comment-form hidden">
+                    <form method="post" action="{% url 'add_comment' %}" class="comment-form hidden" id="child-comment-form-{{ comment.id }}">
                         {% csrf_token %}
                         <input type="hidden" name="parent_id" value="{{ comment.id }}">
-                        <input type="text" name="user_name" id="id_user_name_{{ forloop.parentloop.parentloop.counter }}_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" placeholder="Name" value="Anonymous" required>
-                        <input type="email" name="email" id="id_email_{{ forloop.parentloop.parentloop.counter }}_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" placeholder="Email" required>
-                        <input type="text" name="homepage" id="id_homepage_{{ forloop.parentloop.parentloop.counter }}_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" placeholder="Homepage">
+                        <input type="text" name="user_name" id="id_user_name_{{ comment.id }}" placeholder="Name" value="Anonymous" required>
+                        <input type="email" name="email" id="id_email_{{ comment.id }}" placeholder="Email" required>
+                        <input type="text" name="homepage" id="id_homepage_{{ comment.id }}" placeholder="Homepage">
                         <div class="toolbar">
                             <button type="button" class="strong-btn">B</button>
                             <button type="button" class="italic-btn">I</button>
@@ -115,10 +119,14 @@
                         </div>
                         <input type="file" class="img-input" style="display: none;">
                         <input type="file" class="txt-input" style="display: none;">
-                        <div class="editor" contenteditable="true" placeholder="Write your comment here" id="editor_{{ forloop.parentloop.parentloop.counter }}_{{ forloop.parentloop.counter }}_{{ forloop.counter }}"></div>
-                        <textarea name="content" hidden required id="id_content_{{ forloop.parentloop.parentloop.counter }}_{{ forloop.parentloop.counter }}_{{ forloop.counter }}"></textarea>
+                        <div class="editor" contenteditable="true" placeholder="Write your comment here" id="editor_{{ comment.id }}"></div>
+                        <textarea name="content" hidden required id="id_content_{{ comment.id }}"></textarea>
                         <div class="form-group">
-                            <button type="submit" title="Roote">Send</button>
+                            <img src="/captcha/image/{{ captcha.key }}/" alt="captcha" class="captcha">
+                            <input type="text" name="captcha" class="captcha-input" required placeholder="Enter Captcha">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" title="Roote2">Send</button>
                         </div>
                     </form>
                 </div>
@@ -139,8 +147,20 @@
         button.addEventListener('click', function(event) {
             var commentForm = event.target.nextElementSibling;
             commentForm.classList.toggle('hidden');
+
+            var captchaField = commentForm.querySelector('.captcha');
+            if (!captchaField) {
+                console.error('Captcha field not found!');
+                initializeCaptcha(commentForm);
+            } else {
+                console.log('Captcha field found:', captchaField);
+            }
         });
     });
+
+    function initializeCaptcha(form) {
+        console.log('Initializing captcha for form:', form);
+    }
 </script>
 </body>
 </html>

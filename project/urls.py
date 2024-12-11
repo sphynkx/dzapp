@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from dzencode.views import index, add_comment, add_post, get_post_by_id
+from dzencode.views import index, add_comment, add_post, get_post_by_id, generate_captcha_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -9,4 +9,5 @@ urlpatterns = [
     path('captcha/', include('captcha.urls')),
     path('add_post/', add_post, name='add_post'),
     path('api/posts/<int:post_id>/', get_post_by_id, name='get_post_by_id'),
+    path('generate_captcha/', generate_captcha_view, name='generate_captcha'),
 ]

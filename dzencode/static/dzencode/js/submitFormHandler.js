@@ -89,6 +89,9 @@ export function submitFormHandler(event) {
                             <div class="editor" contenteditable="true" placeholder="Write your comment here"></div>
                             <textarea name="content" hidden required></textarea>
                             <div class="form-group">
+                                {{ comment_form.captcha }}  <!-- Добавляем капчу -->
+                            </div>
+                            <div class="form-group">
                                 <button type="submit" title="Childe2">Send</button>
                             </div>
                         </form>
