@@ -1,5 +1,15 @@
 import { submitFormHandler } from './submitFormHandler.js';
-import { strongButtonHandler, italicButtonHandler, codeButtonHandler, linkButtonHandler, imgButtonHandler, txtButtonHandler, imgInputChangeHandler, txtInputChangeHandler, updateTextarea } from './editorHandler.js';
+import {
+    strongButtonHandler,
+    italicButtonHandler,
+    codeButtonHandler,
+    linkButtonHandler,
+    imgButtonHandler,
+    txtButtonHandler,
+    imgInputChangeHandler,
+    txtInputChangeHandler,
+    updateTextarea
+} from './editorHandler.js';
 
 export function addReplyHandlers() {
     document.querySelectorAll('.reply-btn').forEach(function(button) {
@@ -58,7 +68,7 @@ export function initializeEditorButtons() {
     });
 }
 
-function replyHandler(event) {
+async function replyHandler(event) {
     event.preventDefault();
     console.log('Reply button clicked');
     document.querySelectorAll('.comment-form').forEach(function(form) {
@@ -69,22 +79,27 @@ function replyHandler(event) {
     const commentForm = event.target.nextElementSibling;
     commentForm.classList.toggle('hidden');
 
-    var captchaField = commentForm.querySelector('.captcha');
-    if (!captchaField) {
-        console.error('Captcha field not found!');
-        initializeCaptcha(commentForm);
+    const captchaField = commentForm.querySelector('.captcha');
+    const captchaValueField = commentForm.querySelector('.captcha-value');
+
+    if (captchaField && captchaValueField) {
+        console.log('Captcha fields found:', captchaField, captchaValueField);
     } else {
-        console.log('Captcha field found:', captchaField);
+        console.error('Captcha fields not found!');
     }
 }
 
-function initializeCaptcha(form) {
-    console.log('Initializing captcha for form:', form);
+async function fetchCaptchaData() {
+    try {
+        const response = await fetch('/generate_captcha/');
+        const data = await response.json();
+        console.log('Fetched captcha data:', data);
+        return data;
+    } catch (error) {
+        console.error('Error fetching captcha data:', error);
+        return null;
+    }
 }
-
-document.querySelectorAll('.reply-btn').forEach(function(button) {
-    button.addEventListener('click', replyHandler);
-});
 
 function clearEditor(form) {
     const editorDiv = form.querySelector('.editor');

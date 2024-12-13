@@ -6,7 +6,6 @@ from django.utils import timezone
 import logging
 from captcha.models import CaptchaStore
 from captcha.helpers import captcha_image_url
-from django.http import JsonResponse
 
 logger = logging.getLogger(__name__)
 
@@ -41,25 +40,25 @@ def index(request):
         msgs = MsgDb.objects.select_related('user').filter(is_root=True).order_by('-published_date', '-published_time')
         comment_form = CommentForm()
         post_form = PostForm()
-        return render(request, 'index.html', context={'msgs': msgs, 'comment_form': comment_form, 'post_form': post_form})
-
-
+        captcha = get_new_captcha()
+        return render(request, 'index.html', context={'msgs': msgs, 'comment_form': comment_form, 'post_form': post_form, 'captcha': captcha})
 
 def generate_captcha_view(request):
-    captcha_key, captcha_image_url_value = generate_captcha()
-    return JsonResponse({'captcha_image_url': captcha_image_url_value})
+    captcha = get_new_captcha()
+    return JsonResponse(captcha)
 
-def generate_captcha():
+def get_new_captcha():
     try:
         captcha_key = CaptchaStore.generate_key()
         captcha_image_url_value = captcha_image_url(captcha_key)
-        return captcha_key, captcha_image_url_value
+        captcha_value = CaptchaStore.objects.get(hashkey=captcha_key).response
+        return {'captcha_key': captcha_key, 'captcha_image_url': captcha_image_url_value, 'captcha_value': captcha_value}
     except Exception as e:
         logger.error(f"Error generating captcha: {e}")
-        return None, ''
+        return None
 
 def get_comment_data(comment):
-    captcha_key, captcha_image_url_value = generate_captcha()
+    captcha = get_new_captcha()
 
     return {
         'id': comment.id,
@@ -69,20 +68,48 @@ def get_comment_data(comment):
         'homepage': comment.user.homepage,
         'published_date': comment.published_date.strftime('%Y-%m-%d'),
         'published_time': comment.published_time.strftime('%H:%M:%S'),
-        'captcha_key': captcha_key,
-        'captcha_image_url': captcha_image_url_value,
+        'captcha_key': captcha['captcha_key'],
+        'captcha_image_url': captcha['captcha_image_url'],
+        'captcha_value': captcha['captcha_value'],
         'children': [get_comment_data(c) for c in comment.comments.all()] if comment.comments.exists() else []
     }
 
+
 def add_comment(request):
     if request.method == 'POST' or request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        form = CommentForm(request.POST)
+        logger.info(f"Request POST data: {request.POST}")
+
+        if 'captcha' in request.POST:
+            captcha_response = request.POST['captcha']
+            try:
+                captcha_store = CaptchaStore.objects.get(response=captcha_response)
+                if captcha_store:
+                    logger.info(f"Captcha is valid, captcha_key: {captcha_store.hashkey}")
+                    captcha_store.delete()
+                else:
+                    logger.error("Captcha is invalid or expired")
+                    return JsonResponse({'error': 'Invalid captcha'}, status=400)
+            except CaptchaStore.DoesNotExist:
+                logger.error("Captcha is invalid or expired")
+                return JsonResponse({'error': 'Invalid captcha'}, status=400)
+        else:
+            logger.error("Captcha field is missing")
+            return JsonResponse({'error': 'Captcha field is required'}, status=400)
+
+        form_data = request.POST.copy()
+        form_data.pop('captcha')
+
+        form = CommentForm(form_data)
+
+        logger.info(f"Form data structure: {form.data}")
+        logger.info(f"Form errors before validation: {form.errors}")
+
         if form.is_valid():
+            logger.info("Form is valid")
             content = form.cleaned_data['content']
             user_name = form.cleaned_data['user_name']
             email = form.cleaned_data['email']
             homepage = form.cleaned_data['homepage']
-            captcha = form.cleaned_data['captcha']
             parent_id = request.POST.get('parent_id')
 
             try:
@@ -127,9 +154,9 @@ def add_comment(request):
             else:
                 return redirect('/')
         else:
+            logger.error(f"Invalid form data: {form.errors}")
             return JsonResponse({'error': 'Invalid form data', 'form_errors': form.errors}, status=400)
     return JsonResponse({'error': 'Invalid request method or headers'}, status=400)
-
 
 
 def add_post(request):

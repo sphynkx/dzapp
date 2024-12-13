@@ -86,7 +86,9 @@
                 <div class="editor" contenteditable="true" placeholder="Write your comment here" id="editor_{{ msg.id }}"></div>
                 <textarea name="content" hidden required id="id_content_{{ msg.id }}"></textarea>
                 <div class="form-group">
-                    {{ comment_form.captcha }}
+                    <img src="/captcha/image/{{ captcha.captcha_key }}/" alt="captcha" class="captcha">
+                    <input type="text" name="captcha" class="captcha" required placeholder="Enter Captcha">
+                    <span class="captcha-value">{{ captcha.captcha_value }}</span>
                 </div>
                 <div class="form-group">
                     <button type="submit" title="Roote1">Send</button>
@@ -122,8 +124,9 @@
                         <div class="editor" contenteditable="true" placeholder="Write your comment here" id="editor_{{ comment.id }}"></div>
                         <textarea name="content" hidden required id="id_content_{{ comment.id }}"></textarea>
                         <div class="form-group">
-                            <img src="/captcha/image/{{ captcha.key }}/" alt="captcha" class="captcha">
-                            <input type="text" name="captcha" class="captcha-input" required placeholder="Enter Captcha">
+                            <img src="/captcha/image/{{ captcha.captcha_key }}/" alt="captcha" class="captcha">
+                            <input type="text" name="captcha" class="captcha" required placeholder="Enter Captcha">
+                            <span class="captcha-value">{{ captcha.captcha_value }}</span>
                         </div>
                         <div class="form-group">
                             <button type="submit" title="Roote2">Send</button>
@@ -144,22 +147,41 @@
     };
 
     document.querySelectorAll('.reply-btn').forEach(function(button) {
-        button.addEventListener('click', function(event) {
+        button.addEventListener('click', async function(event) {
             var commentForm = event.target.nextElementSibling;
             commentForm.classList.toggle('hidden');
 
             var captchaField = commentForm.querySelector('.captcha');
             if (!captchaField) {
                 console.error('Captcha field not found!');
-                initializeCaptcha(commentForm);
+                await initializeCaptcha(commentForm);
             } else {
                 console.log('Captcha field found:', captchaField);
+                const captchaValue = commentForm.querySelector('.captcha-value');
+                if (!captchaValue) {
+                    await initializeCaptcha(commentForm);
+                } else {
+                    console.log('Captcha value found:', captchaValue);
+                }
             }
         });
     });
 
-    function initializeCaptcha(form) {
-        console.log('Initializing captcha for form:', form);
+    async function initializeCaptcha(form) {
+        try {
+            const response = await fetch('/generate_captcha/');
+            const data = await response.json();
+
+            const captchaImage = form.querySelector('.captcha');
+            const captchaInput = form.querySelector('.captcha');
+            const captchaValue = form.querySelector('.captcha-value');
+
+            if (captchaImage) captchaImage.src = data.captcha_image_url;
+            if (captchaInput) captchaInput.value = '';
+            if (captchaValue) captchaValue.textContent = data.captcha_value;
+        } catch (error) {
+            console.error('Error initializing captcha:', error);
+        }
     }
 </script>
 </body>

@@ -4,10 +4,10 @@ async function generateCaptcha() {
     try {
         const response = await fetch('/generate_captcha/');
         const data = await response.json();
-        return data.captcha_image_url;
+        return data;
     } catch (error) {
         console.error('Error generating captcha:', error);
-        return '';
+        return null;
     }
 }
 
@@ -18,11 +18,12 @@ export async function renderComments(comments, container) {
         commentElement.dataset.id = comment.id;
         console.log('Rendering comment:', comment.id, comment);
 
-        const captchaImageUrl = await generateCaptcha();
-        console.log('Captcha Image URL:', captchaImageUrl);
+        const captchaData = await generateCaptcha();
+        console.log('Captcha Data:', captchaData);
 
-        if (!captchaImageUrl) {
-            console.error('Captcha image URL is empty!');
+        if (!captchaData || !captchaData.captcha_image_url) {
+            console.error('Captcha data is empty or captcha image URL is missing!');
+            return;
         }
 
         commentElement.innerHTML = `
@@ -55,11 +56,12 @@ export async function renderComments(comments, container) {
                 <div class="editor" contenteditable="true" placeholder="Write your comment here"></div>
                 <textarea name="content" hidden required></textarea>
                 <div class="form-group">
-                    <img src="${captchaImageUrl}" alt="Captcha Image" class="captcha-image">
+                    <img src="${captchaData.captcha_image_url}" alt="Captcha Image" class="captcha-image">
                     <input type="text" name="captcha" class="captcha" required placeholder="Enter Captcha">
+                    <span class="captcha-value">${captchaData.captcha_value}</span>
                 </div>
                 <div class="form-group">
-                    <button type="submit" title="Childe2">Send</button>
+                    <button type="submit" title="Child">Send</button>
                 </div>
             </form>
             <div class="comments"></div>
