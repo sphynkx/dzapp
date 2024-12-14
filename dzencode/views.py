@@ -6,6 +6,7 @@ from django.utils import timezone
 import logging
 from captcha.models import CaptchaStore
 from captcha.helpers import captcha_image_url
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ def index(request):
         comment_form = CommentForm()
         post_form = PostForm()
         captcha = get_new_captcha()
-        return render(request, 'index.html', context={'msgs': msgs, 'comment_form': comment_form, 'post_form': post_form, 'captcha': captcha})
+        return render(request, 'index.html', context={'msgs': msgs, 'comment_form': comment_form, 'post_form': post_form, 'show_captcha_text': settings.SHOW_CAPTCHA_TEXT, 'captcha': captcha})
 
 def generate_captcha_view(request):
     captcha = get_new_captcha()

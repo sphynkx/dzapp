@@ -58,7 +58,7 @@ export async function renderComments(comments, container) {
                 <div class="form-group">
                     <img src="${captchaData.captcha_image_url}" alt="Captcha Image" class="captcha-image">
                     <input type="text" name="captcha" class="captcha" required placeholder="Enter Captcha">
-                    <span class="captcha-value">${captchaData.captcha_value}</span>
+                    <span class="captcha-value ${showCaptchaText === 'false' ? 'hidden-captcha-value' : ''}">${captchaData.captcha_value}</span>
                 </div>
                 <div class="form-group">
                     <button type="submit" title="Child">Send</button>

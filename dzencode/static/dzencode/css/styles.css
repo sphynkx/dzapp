@@ -145,3 +145,6 @@ button:hover {
 .sort-options {
     margin: 20px;
 }
+.hidden-captcha-value {
+    display: none;
+}

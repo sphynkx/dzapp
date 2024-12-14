@@ -84,6 +84,9 @@ async function replyHandler(event) {
 
     if (captchaField && captchaValueField) {
         console.log('Captcha fields found:', captchaField, captchaValueField);
+        if (showCaptchaText === 'false') {
+            captchaValueField.classList.add('hidden-captcha-value');
+        }
     } else {
         console.error('Captcha fields not found!');
     }

@@ -54,6 +54,7 @@ export async function submitFormHandler(event) {
                 const commentElement = document.createElement('div');
                 commentElement.classList.add('comment');
                 commentElement.dataset.id = comment.id;
+                const showCaptchaText = '{{ show_captcha_text|yesno:"true,false" }}';
                 commentElement.innerHTML = `
                     <strong>${comment.user__username}</strong>
                     <a href="${comment.homepage}" target="_blank">🏠</a>
@@ -86,7 +87,7 @@ export async function submitFormHandler(event) {
                         <div class="form-group">
                             <img src="${comment.captcha_image_url}" alt="Captcha Image" class="captcha-image">
                             <input type="text" name="captcha" class="captcha" required placeholder="Enter Captcha">
-                            <span class="captcha-value">${comment.captcha_value}</span>
+                            <span class="captcha-value ${showCaptchaText === 'false' ? 'hidden-captcha-value' : ''}">${comment.captcha_value}</span>
                         </div>
                         <div class="form-group">
                             <button type="submit" title="Childe2">Send</button>
@@ -103,6 +104,11 @@ export async function submitFormHandler(event) {
                 addReplyHandlers();
                 initializeEditorButtons();
                 applyStyles(commentElement);
+
+                const captchaValueElement = commentElement.querySelector('.captcha-value');
+                if (captchaValueElement && showCaptchaText === 'false') {
+                    captchaValueElement.classList.add('hidden-captcha-value');
+                }
             } else {
                 console.error('Comments container not found');
             }

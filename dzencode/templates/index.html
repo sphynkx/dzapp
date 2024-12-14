@@ -88,7 +88,7 @@
                 <div class="form-group">
                     <img src="/captcha/image/{{ captcha.captcha_key }}/" alt="captcha" class="captcha">
                     <input type="text" name="captcha" class="captcha" required placeholder="Enter Captcha">
-                    <span class="captcha-value">{{ captcha.captcha_value }}</span>
+                    <span class="captcha-value {% if not show_captcha_text %}hidden-captcha-value{% endif %}">{{ captcha.captcha_value }}</span>
                 </div>
                 <div class="form-group">
                     <button type="submit" title="Roote1">Send</button>
@@ -126,7 +126,7 @@
                         <div class="form-group">
                             <img src="/captcha/image/{{ captcha.captcha_key }}/" alt="captcha" class="captcha">
                             <input type="text" name="captcha" class="captcha" required placeholder="Enter Captcha">
-                            <span class="captcha-value">{{ captcha.captcha_value }}</span>
+                            <span class="captcha-value {% if not show_captcha_text %}hidden-captcha-value{% endif %}">{{ captcha.captcha_value }}</span>
                         </div>
                         <div class="form-group">
                             <button type="submit" title="Roote2">Send</button>
@@ -141,6 +141,8 @@
 </div>
 <hr>
 <script>
+    const showCaptchaText = "{{ show_captcha_text|yesno:'true,false' }}";
+
     document.getElementById('add-post-btn').onclick = function() {
         var postFormContainer = document.getElementById('post-form-container');
         postFormContainer.style.display = postFormContainer.style.display === 'none' ? 'block' : 'none';
