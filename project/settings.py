@@ -16,7 +16,7 @@ DEBUG = True
 ##SHOW_CAPTCHA_TEXT = True
 SHOW_CAPTCHA_TEXT = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.7.3', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -62,7 +62,7 @@ TEMPLATES = [
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR/"static",
+##    BASE_DIR/"static",
 ]
 
 WSGI_APPLICATION = 'project.wsgi.application'
