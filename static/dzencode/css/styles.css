@@ -1,0 +1,150 @@
+﻿.msg-output {
+    display: none;
+}
+.msg-output.active {
+    display: block;
+    border: 1px solid lightgray;
+    padding: 10px;
+    margin-top: 5px;
+}
+.msg-item {
+    border: 0px solid darkgray;
+    margin: -10px 1px -10px 1px;
+}
+.msg-all {
+    border: 1px solid blue;
+    max-height:450px;
+    width:100%;
+    overflow-x:hidden;
+    overflow-y: auto;
+    padding-bottom:10px;
+}
+.msg-user, .msg-date {
+    display: inline-block;
+    margin-right: 5px;
+}
+.msg-user {
+    font-weight: bold;
+}
+.msg-aftertitle {
+    font-weight: normal;
+    display: inline;
+}
+.msg-content {
+    display: block;
+    border: 1px solid red;
+    padding: 10px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+.form-group {
+    margin-bottom: 10px;
+}
+textarea {
+    width: 100%;
+    height: 100px;
+}
+.hidden {
+    display: none;
+}
+.comment {
+    margin-left: 20px;
+    border-left: 1px solid lightgray;
+    padding-left: 10px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+.comment p {
+    margin: 0;
+}
+.comment-content {
+    border: 1px dotted blue;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: ghostwhite;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+.reply-btn {
+    margin-top: 10px;
+}
+.toolbar {
+    margin-bottom: 10px;
+}
+button {
+    background-color: gray;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+button:hover {
+    background-color: lightgray;
+}
+.editor {
+    border: 1px solid lightgray;
+    padding: 10px;
+    min-height: 100px;
+    margin-bottom: 10px;
+}
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    /*background-color: rgba(0,0,0,0.2);*/
+}
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border: 1px solid lightgray;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+}
+.modal-content label,
+.modal-content input {
+    margin-bottom: 10px;
+}
+.modal-content .buttons {
+    display: flex;
+    justify-content: space-between;
+}
+.url-submit[disabled] {
+    background-color: lightgray;
+    cursor: not-allowed;
+}
+.comment-content img, .msg-content img {
+    float: right;
+    margin: 10px 0 10px 10px;
+    max-width: 30%;
+    height: auto;
+    border: 2px solid transparent;
+    padding: 2px;
+    box-sizing: border-box;
+}
+.comment-content img:hover, .msg-content img:hover {
+    border-color: red;
+}
+.comment-content pre, .msg-content pre {
+    border: 2px solid transparent;
+    padding: 2px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+.comment-content pre:hover, .msg-content pre:hover {
+    border-color: blue;
+}
+.sort-options {
+    margin: 20px;
+}
+.hidden-captcha-value {
+    display: none;
+}

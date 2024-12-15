@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -18,6 +19,10 @@ SHOW_CAPTCHA_TEXT = False
 
 ALLOWED_HOSTS = ['192.168.7.3', 'localhost', '127.0.0.1']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://dzapp.sphynkx.org.ua',
+    'http://192.168.7.3:8000',
+]
 
 # Application definition
 
@@ -61,6 +66,8 @@ TEMPLATES = [
 ]
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 STATICFILES_DIRS = [
 ##    BASE_DIR/"static",
 ]
